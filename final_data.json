@@ -1,0 +1,313 @@
+{
+  "income": [
+    {
+      "id": 30640,
+      "source": "Salary/Wages (McK)",
+      "category": "salary",
+      "amount": 5031.58,
+      "frequency": "monthly",
+      "startDate": "2024-01-01",
+      "endDate": ""
+    },
+    {
+      "id": 5237,
+      "source": "Salary/Wages (KPMG)",
+      "category": "salary",
+      "amount": 5229.0,
+      "frequency": "monthly",
+      "startDate": "2024-01-01",
+      "endDate": ""
+    },
+    {
+      "id": 81133,
+      "source": "Viva Rental",
+      "category": "passive",
+      "amount": 1080.0,
+      "frequency": "monthly",
+      "startDate": "2024-01-01",
+      "endDate": ""
+    },
+    {
+      "id": 11788,
+      "source": "Capital Gain",
+      "category": "other",
+      "amount": 3700.0,
+      "frequency": "monthly",
+      "startDate": "2024-01-01",
+      "endDate": ""
+    }
+  ],
+  "expenses": [
+    {
+      "id": 98848,
+      "description": "Mortgage",
+      "category": "other",
+      "amount": 628.33,
+      "date": "2024-02-01",
+      "recurring": true,
+      "paymentMethod": "credit_card"
+    },
+    {
+      "id": 3129,
+      "description": "Rent",
+      "category": "other",
+      "amount": 2150.0,
+      "date": "2024-02-01",
+      "recurring": true,
+      "paymentMethod": "credit_card"
+    },
+    {
+      "id": 48628,
+      "description": "Electricity",
+      "category": "other",
+      "amount": 100.0,
+      "date": "2024-02-01",
+      "recurring": true,
+      "paymentMethod": "credit_card"
+    },
+    {
+      "id": 36502,
+      "description": "Phone",
+      "category": "other",
+      "amount": 10.0,
+      "date": "2024-02-01",
+      "recurring": true,
+      "paymentMethod": "credit_card"
+    },
+    {
+      "id": 75065,
+      "description": "Internet",
+      "category": "other",
+      "amount": 50.0,
+      "date": "2024-02-01",
+      "recurring": true,
+      "paymentMethod": "credit_card"
+    },
+    {
+      "id": 55528,
+      "description": "Furnishing/Appliances",
+      "category": "other",
+      "amount": 83.33,
+      "date": "2024-02-01",
+      "recurring": true,
+      "paymentMethod": "credit_card"
+    },
+    {
+      "id": 20407,
+      "description": "Council Tax",
+      "category": "other",
+      "amount": 197.0,
+      "date": "2024-02-01",
+      "recurring": true,
+      "paymentMethod": "credit_card"
+    },
+    {
+      "id": 5509,
+      "description": "Viva (service charge+other)",
+      "category": "other",
+      "amount": 208.33,
+      "date": "2024-02-01",
+      "recurring": true,
+      "paymentMethod": "credit_card"
+    },
+    {
+      "id": 78190,
+      "description": "Uber",
+      "category": "other",
+      "amount": 50.0,
+      "date": "2024-02-01",
+      "recurring": true,
+      "paymentMethod": "credit_card"
+    },
+    {
+      "id": 81765,
+      "description": "Public Transportation",
+      "category": "other",
+      "amount": 20.0,
+      "date": "2024-02-01",
+      "recurring": true,
+      "paymentMethod": "credit_card"
+    },
+    {
+      "id": 87737,
+      "description": "Groceries (Ocado)",
+      "category": "other",
+      "amount": 400.0,
+      "date": "2024-02-01",
+      "recurring": true,
+      "paymentMethod": "credit_card"
+    },
+    {
+      "id": 35464,
+      "description": "Delivery (Deliveroo + UberEat Trinh+QUan)",
+      "category": "other",
+      "amount": 750.0,
+      "date": "2024-02-01",
+      "recurring": true,
+      "paymentMethod": "credit_card"
+    },
+    {
+      "id": 36875,
+      "description": "Dining Out",
+      "category": "other",
+      "amount": 800.0,
+      "date": "2024-02-01",
+      "recurring": true,
+      "paymentMethod": "credit_card"
+    },
+    {
+      "id": 61950,
+      "description": "Clothing",
+      "category": "other",
+      "amount": 300.0,
+      "date": "2024-02-01",
+      "recurring": true,
+      "paymentMethod": "credit_card"
+    },
+    {
+      "id": 36711,
+      "description": "Beauty (boots, superdrug, stylevana)",
+      "category": "other",
+      "amount": 80.0,
+      "date": "2024-02-01",
+      "recurring": true,
+      "paymentMethod": "credit_card"
+    },
+    {
+      "id": 12124,
+      "description": "Salon/Barber (quan)",
+      "category": "other",
+      "amount": 50.0,
+      "date": "2024-02-01",
+      "recurring": true,
+      "paymentMethod": "credit_card"
+    },
+    {
+      "id": 26658,
+      "description": "Nespresso",
+      "category": "other",
+      "amount": 15.0,
+      "date": "2024-02-01",
+      "recurring": true,
+      "paymentMethod": "credit_card"
+    },
+    {
+      "id": 67495,
+      "description": "Subscriptions (Netflix, Uber Eat, Deliveroo, OneDrive) ",
+      "category": "other",
+      "amount": 50.0,
+      "date": "2024-02-01",
+      "recurring": true,
+      "paymentMethod": "credit_card"
+    },
+    {
+      "id": 91743,
+      "description": "Finance Installments (Paypal, V12, Barclays, Samsung finance, Nomuno)",
+      "category": "other",
+      "amount": 450.0,
+      "date": "2024-02-01",
+      "recurring": true,
+      "paymentMethod": "credit_card"
+    },
+    {
+      "id": 66320,
+      "description": "Amazon purchases",
+      "category": "other",
+      "amount": 100.0,
+      "date": "2024-02-01",
+      "recurring": true,
+      "paymentMethod": "credit_card"
+    },
+    {
+      "id": 17768,
+      "description": "Doctors/Dentist Visits",
+      "category": "other",
+      "amount": 41.67,
+      "date": "2024-02-01",
+      "recurring": true,
+      "paymentMethod": "credit_card"
+    },
+    {
+      "id": 47337,
+      "description": "Holidays",
+      "category": "other",
+      "amount": 3000.0,
+      "date": "2024-02-01",
+      "recurring": true,
+      "paymentMethod": "credit_card"
+    }
+  ],
+  "assets": [
+    {
+      "id": 85763,
+      "name": "92 Viva (market value minus mortgage)",
+      "type": "Cash",
+      "value": 140000.0,
+      "liquidity": "Medium",
+      "date": "2024-01-01"
+    },
+    {
+      "id": 71661,
+      "name": "Physical assets",
+      "type": "Physical",
+      "value": 30000.0,
+      "liquidity": "Medium",
+      "date": "2024-01-01"
+    }
+  ],
+  "liabilities": [],
+  "investments": [
+    {
+      "id": 46656,
+      "name": "Trinh's McK Pension",
+      "category": "pension",
+      "quantity": 1,
+      "currentPrice": 17166.0,
+      "costBasis": 13732.800000000001,
+      "currentValue": 17166.0,
+      "date": "2024-01-01"
+    },
+    {
+      "id": 54226,
+      "name": "Trinh's DB Pension (standard Life)",
+      "category": "pension",
+      "quantity": 1,
+      "currentPrice": 51452.0,
+      "costBasis": 41161.600000000006,
+      "currentValue": 51452.0,
+      "date": "2024-01-01"
+    },
+    {
+      "id": 31843,
+      "name": "Quan's KPMG pension (standard life)",
+      "category": "pension",
+      "quantity": 1,
+      "currentPrice": 28355.0,
+      "costBasis": 22684.0,
+      "currentValue": 28355.0,
+      "date": "2024-01-01"
+    },
+    {
+      "id": 51596,
+      "name": "US equity (investing.com)",
+      "category": "stocks",
+      "quantity": 1,
+      "currentPrice": 1378465.0,
+      "costBasis": 1102772.0,
+      "currentValue": 1378465.0,
+      "date": "2024-01-01"
+    },
+    {
+      "id": 6540,
+      "name": "UK equity (investing.com)",
+      "category": "stocks",
+      "quantity": 1,
+      "currentPrice": 208000.0,
+      "costBasis": 166400.0,
+      "currentValue": 208000.0,
+      "date": "2024-01-01"
+    }
+  ],
+  "goals": [],
+  "budget": []
+}

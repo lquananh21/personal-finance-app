@@ -941,6 +941,12 @@
         background: #fff
       }
     }
+
+    #saveIndicator {
+      margin-left: 20px;
+      font-size: 0.9rem;
+      transition: opacity 0.5s;
+    }
   </style>
 </head>
 
@@ -974,6 +980,7 @@
         <h2 id="pageTitle">Dashboard</h2>
       </div>
       <div class="topbar-actions">
+        <div id="saveIndicator"></div>
         <span style="font-size:.82rem;color:var(--text-muted)" id="currentDate"></span>
       </div>
     </header>
@@ -988,76 +995,59 @@
   <script>
 
     // ═══════════════════════════════════════
-    // DATA LAYER
+    // DATA LAYER (in-memory, persisted to localStorage)
     // ═══════════════════════════════════════
-    const DATA = {
-      incomes: [
-        { id: 1, source: 'Salary (McK - Trinh)', category: 'salary', amount: 5039, frequency: 'monthly', startDate: '2024-01-01', endDate: '' },
-        { id: 2, source: 'Salary (KPMG - Quan)', category: 'salary', amount: 4875, frequency: 'monthly', startDate: '2024-01-01', endDate: '' },
-        { id: 3, source: 'Viva Apartment 92 Rental', category: 'passive', amount: 1080, frequency: 'monthly', startDate: '2024-01-01', endDate: '' },
-        { id: 4, source: 'Capital Gain', category: 'investments', amount: 3700, frequency: 'one-time', startDate: '2024-01-15', endDate: '2024-01-15' },
+    let financialData = {
+      income: [
+        { "id": 30640, "source": "Salary/Wages (McK)", "category": "salary", "amount": 5031.58, "frequency": "monthly", "startDate": "2024-01-01", "endDate": "" },
+        { "id": 5237, "source": "Salary/Wages (KPMG)", "category": "salary", "amount": 5229.0, "frequency": "monthly", "startDate": "2024-01-01", "endDate": "" },
+        { "id": 81133, "source": "Viva Rental", "category": "passive", "amount": 1080.0, "frequency": "monthly", "startDate": "2024-01-01", "endDate": "" },
+        { "id": 11788, "source": "Capital Gain", "category": "other", "amount": 3700.0, "frequency": "monthly", "startDate": "2024-01-01", "endDate": "" }
       ],
       expenses: [
-        // HOME
-        { id: 1, description: 'Mortgage (Viva Apt 92)', category: 'housing', amount: 630, date: '2024-01-01', recurring: true, paymentMethod: 'bank_transfer' },
-        { id: 2, description: 'Rent (London)', category: 'housing', amount: 2150, date: '2024-01-01', recurring: true, paymentMethod: 'bank_transfer' },
-        { id: 3, description: 'Council Tax', category: 'housing', amount: 197, date: '2024-01-01', recurring: true, paymentMethod: 'bank_transfer' },
-        { id: 4, description: 'Viva Service Charge & Other', category: 'housing', amount: 120, date: '2024-01-01', recurring: true, paymentMethod: 'bank_transfer' },
-        { id: 5, description: 'Electricity', category: 'utilities', amount: 100, date: '2024-01-01', recurring: true, paymentMethod: 'bank_transfer' },
-        { id: 6, description: 'Internet', category: 'utilities', amount: 50, date: '2024-01-01', recurring: true, paymentMethod: 'bank_transfer' },
-        { id: 7, description: 'Phone', category: 'utilities', amount: 10, date: '2024-01-01', recurring: true, paymentMethod: 'bank_transfer' },
-        // TRANSPORT
-        { id: 8, description: 'Uber', category: 'transport', amount: 50, date: '2024-01-01', recurring: true, paymentMethod: 'debit' },
-        { id: 9, description: 'Public Transportation', category: 'transport', amount: 20, date: '2024-01-01', recurring: true, paymentMethod: 'debit' },
-        // FOOD & DAILY LIVING
-        { id: 10, description: 'Groceries (Ocado)', category: 'food', amount: 400, date: '2024-01-01', recurring: true, paymentMethod: 'debit' },
-        { id: 11, description: 'Delivery (Deliveroo + UberEats)', category: 'food', amount: 750, date: '2024-01-01', recurring: true, paymentMethod: 'credit_card' },
-        { id: 12, description: 'Dining Out', category: 'food', amount: 800, date: '2024-01-01', recurring: false, paymentMethod: 'credit_card' },
-        { id: 13, description: 'Clothing', category: 'personal', amount: 300, date: '2024-01-01', recurring: false, paymentMethod: 'credit_card' },
-        { id: 14, description: 'Beauty Products', category: 'personal', amount: 80, date: '2024-01-01', recurring: true, paymentMethod: 'debit' },
-        { id: 15, description: 'Salon/Barber (Quan)', category: 'personal', amount: 50, date: '2024-01-01', recurring: true, paymentMethod: 'cash' },
-        { id: 16, description: 'Nespresso', category: 'food', amount: 15, date: '2024-01-01', recurring: true, paymentMethod: 'debit' },
-        // ENTERTAINMENT
-        { id: 17, description: 'Subscriptions (Netflix, UberEat, Deliveroo, OneDrive)', category: 'entertainment', amount: 50, date: '2024-01-01', recurring: true, paymentMethod: 'credit_card' },
-        { id: 18, description: 'Finance Installments (PayPal, V12, Barclays, Samsung, Nomuno)', category: 'entertainment', amount: 450, date: '2024-01-01', recurring: true, paymentMethod: 'bank_transfer' },
-        { id: 19, description: 'Amazon Purchases', category: 'entertainment', amount: 100, date: '2024-01-01', recurring: false, paymentMethod: 'credit_card' },
-        // HEALTH
-        { id: 20, description: 'Doctors/Dentist Visits', category: 'healthcare', amount: 42, date: '2024-01-01', recurring: false, paymentMethod: 'debit' },
-        { id: 21, description: 'Holidays (Annual)', category: 'entertainment', amount: 3000, date: '2024-01-01', recurring: false, paymentMethod: 'credit_card' },
+        { "id": 98848, "description": "Mortgage", "category": "other", "amount": 628.33, "date": "2024-02-01", "recurring": true, "paymentMethod": "credit_card" },
+        { "id": 3129, "description": "Rent", "category": "other", "amount": 2150.0, "date": "2024-02-01", "recurring": true, "paymentMethod": "credit_card" },
+        { "id": 48628, "description": "Electricity", "category": "other", "amount": 100.0, "date": "2024-02-01", "recurring": true, "paymentMethod": "credit_card" },
+        { "id": 36502, "description": "Phone", "category": "other", "amount": 10.0, "date": "2024-02-01", "recurring": true, "paymentMethod": "credit_card" },
+        { "id": 75065, "description": "Internet", "category": "other", "amount": 50.0, "date": "2024-02-01", "recurring": true, "paymentMethod": "credit_card" },
+        { "id": 55528, "description": "Furnishing/Appliances", "category": "other", "amount": 83.33, "date": "2024-02-01", "recurring": true, "paymentMethod": "credit_card" },
+        { "id": 20407, "description": "Council Tax", "category": "other", "amount": 197.0, "date": "2024-02-01", "recurring": true, "paymentMethod": "credit_card" },
+        { "id": 5509, "description": "Viva (service charge+other)", "category": "other", "amount": 208.33, "date": "2024-02-01", "recurring": true, "paymentMethod": "credit_card" },
+        { "id": 78190, "description": "Uber", "category": "other", "amount": 50.0, "date": "2024-02-01", "recurring": true, "paymentMethod": "credit_card" },
+        { "id": 81765, "description": "Public Transportation", "category": "other", "amount": 20.0, "date": "2024-02-01", "recurring": true, "paymentMethod": "credit_card" },
+        { "id": 87737, "description": "Groceries (Ocado)", "category": "other", "amount": 400.0, "date": "2024-02-01", "recurring": true, "paymentMethod": "credit_card" },
+        { "id": 35464, "description": "Delivery (Deliveroo + UberEat Trinh+QUan)", "category": "other", "amount": 750.0, "date": "2024-02-01", "recurring": true, "paymentMethod": "credit_card" },
+        { "id": 36875, "description": "Dining Out", "category": "other", "amount": 800.0, "date": "2024-02-01", "recurring": true, "paymentMethod": "credit_card" },
+        { "id": 61950, "description": "Clothing", "category": "other", "amount": 300.0, "date": "2024-02-01", "recurring": true, "paymentMethod": "credit_card" },
+        { "id": 36711, "description": "Beauty (boots, superdrug, stylevana)", "category": "other", "amount": 80.0, "date": "2024-02-01", "recurring": true, "paymentMethod": "credit_card" },
+        { "id": 12124, "description": "Salon/Barber (quan)", "category": "other", "amount": 50.0, "date": "2024-02-01", "recurring": true, "paymentMethod": "credit_card" },
+        { "id": 26658, "description": "Nespresso", "category": "other", "amount": 15.0, "date": "2024-02-01", "recurring": true, "paymentMethod": "credit_card" },
+        { "id": 67495, "description": "Subscriptions (Netflix, Uber Eat, Deliveroo, OneDrive) ", "category": "other", "amount": 50.0, "date": "2024-02-01", "recurring": true, "paymentMethod": "credit_card" },
+        { "id": 91743, "description": "Finance Installments (Paypal, V12, Barclays, Samsung finance, Nomuno)", "category": "other", "amount": 450.0, "date": "2024-02-01", "recurring": true, "paymentMethod": "credit_card" },
+        { "id": 66320, "description": "Amazon purchases", "category": "other", "amount": 100.0, "date": "2024-02-01", "recurring": true, "paymentMethod": "credit_card" },
+        { "id": 17768, "description": "Doctors/Dentist Visits", "category": "other", "amount": 41.67, "date": "2024-02-01", "recurring": true, "paymentMethod": "credit_card" },
+        { "id": 47337, "description": "Holidays", "category": "other", "amount": 3000.0, "date": "2024-02-01", "recurring": true, "paymentMethod": "credit_card" }
       ],
-      budgets: [
-        { category: 'housing', allocated: 3097 },
-        { category: 'utilities', allocated: 160 },
-        { category: 'transport', allocated: 70 },
-        { category: 'food', allocated: 1965 },
-        { category: 'personal', allocated: 430 },
-        { category: 'entertainment', allocated: 600 },
-        { category: 'healthcare', allocated: 42 },
-        { category: 'savings', allocated: 2000 },
+      assets: [
+        { "id": 85763, "name": "92 Viva (market value minus mortgage)", "type": "Cash", "value": 140000.0, "liquidity": "Medium", "date": "2024-01-01" },
+        { "id": 71661, "name": "Physical assets", "type": "Physical", "value": 30000.0, "liquidity": "Medium", "date": "2024-01-01" }
       ],
+      liabilities: [],
       investments: [
-        { id: 1, name: 'US Equity Portfolio (Investing.com)', category: 'stocks', costBasis: 1200000, currentValue: 1378465, date: '2020-01-01' },
-        { id: 2, name: 'UK Equity Portfolio (Investing.com)', category: 'stocks', costBasis: 180000, currentValue: 208000, date: '2020-01-01' },
-        { id: 3, name: 'Viva Apartment 92 (Equity)', category: 'property', costBasis: 100000, currentValue: 140000, date: '2021-01-01' },
-        { id: 4, name: "Trinh's McK Pension", category: 'pension', costBasis: 15000, currentValue: 17166, date: '2020-01-01' },
-        { id: 5, name: "Trinh's DB Pension (Standard Life)", category: 'pension', costBasis: 40000, currentValue: 51452, date: '2018-01-01' },
-        { id: 6, name: "Quan's KPMG Pension (Standard Life)", category: 'pension', costBasis: 22000, currentValue: 28355, date: '2019-01-01' },
-        { id: 7, name: 'Physical Assets', category: 'cash', costBasis: 30000, currentValue: 30000, date: '2024-01-01' },
-        { id: 8, name: 'Liquid Assets (Stocks, Crypto)', category: 'stocks', costBasis: 24000, currentValue: 24000, date: '2024-01-01' },
+        { "id": 46656, "name": "Trinh's McK Pension", "category": "pension", "quantity": 1, "currentPrice": 17166.0, "costBasis": 13732.8, "currentValue": 17166.0, "date": "2024-01-01" },
+        { "id": 54226, "name": "Trinh's DB Pension (standard Life)", "category": "pension", "quantity": 1, "currentPrice": 51452.0, "costBasis": 41161.6, "currentValue": 51452.0, "date": "2024-01-01" },
+        { "id": 31843, "name": "Quan's KPMG pension (standard life)", "category": "pension", "quantity": 1, "currentPrice": 28355.0, "costBasis": 22684.0, "currentValue": 28355.0, "date": "2024-01-01" },
+        { "id": 51596, "name": "US equity (investing.com)", "category": "stocks", "quantity": 1, "currentPrice": 1378465.0, "costBasis": 1102772.0, "currentValue": 1378465.0, "date": "2024-01-01" },
+        { "id": 6540, "name": "UK equity (investing.com)", "category": "stocks", "quantity": 1, "currentPrice": 208000.0, "costBasis": 166400.0, "currentValue": 208000.0, "date": "2024-01-01" }
       ],
-      debts: [
-        { id: 1, name: 'Viva Apartment 92 Mortgage', type: 'mortgage', balance: 160000, interestRate: 4.5, minPayment: 630, startDate: '2021-06-01' },
-        { id: 2, name: 'Finance Installments (PayPal, V12, Barclays, Samsung, Nomuno)', type: 'loan', balance: 5400, interestRate: 8.0, minPayment: 450, startDate: '2024-01-01' },
-      ],
-      goals: [
-        { id: 1, name: 'Emergency Fund (6 months)', category: 'emergency', targetAmount: 60000, currentAmount: 30000, deadline: '2026-12-31' },
-        { id: 2, name: 'Retirement Portfolio Target', category: 'retirement', targetAmount: 2000000, currentAmount: 1853438, deadline: '2055-01-01' },
-        { id: 3, name: 'Pay Off Finance Installments', category: 'house', targetAmount: 5400, currentAmount: 0, deadline: '2025-12-31' },
-        { id: 4, name: 'Holiday Fund 2025', category: 'education', targetAmount: 36000, currentAmount: 0, deadline: '2025-07-01' },
-      ],
-      netWorthHistory: [
-        { month: 'Jan 2024', value: 1650000 }, { month: 'Mar 2024', value: 1700000 }, { month: 'May 2024', value: 1720000 },
-        { month: 'Jul 2024', value: 1760000 }, { month: 'Sep 2024', value: 1800000 }, { month: 'Nov 2024', value: 1853438 },
+      goals: [],
+      budget: [],
+      settings: {},
+      lastUpdated: new Date().toISOString(),
+      history: [
+        { month: 'Jan', value: 1650000 }, { month: 'Feb', value: 1660000 }, { month: 'Mar', value: 1680000 }, { month: 'Apr', value: 1700000 },
+        { month: 'May', value: 1720000 }, { month: 'Jun', value: 1740000 }, { month: 'Jul', value: 1760000 }, { month: 'Aug', value: 1790000 },
+        { month: 'Sep', value: 1810000 }, { month: 'Oct', value: 1830000 }, { month: 'Nov', value: 1850000 }
       ]
     };
     let nextId = 100;
@@ -1153,7 +1143,7 @@
     // ═══════════════════════════════════════
     function calcMonthlyIncome() {
       const now = new Date();
-      return DATA.incomes.reduce((s, i) => {
+      return financialData.income.reduce((s, i) => {
         const start = i.startDate ? new Date(i.startDate) : null;
         const end = i.endDate ? new Date(i.endDate) : null;
         if (start && start > now) return s;
@@ -1161,21 +1151,21 @@
         return s + monthlyAmount(i);
       }, 0);
     }
-    function calcMonthlyExpenses() { return sumBy(DATA.expenses, 'amount') }
-    function calcTotalAssets() { return sumBy(DATA.investments, 'currentValue') }
-    function calcTotalDebts() { return sumBy(DATA.debts, 'balance') }
+    function calcMonthlyExpenses() { return sumBy(financialData.expenses, 'amount') }
+    function calcTotalAssets() { return sumBy(financialData.investments, 'currentValue') }
+    function calcTotalDebts() { return sumBy(financialData.liabilities, 'balance') }
     function calcNetWorth() { return calcTotalAssets() - calcTotalDebts() }
     function calcSavingsRate() { const i = calcMonthlyIncome(); return i ? ((i - calcMonthlyExpenses()) / i) * 100 : 0 }
-    function calcDebtToIncome() { const i = calcMonthlyIncome(); return i ? (sumBy(DATA.debts, 'minPayment') / i) * 100 : 0 }
+    function calcDebtToIncome() { const i = calcMonthlyIncome(); return i ? (sumBy(financialData.liabilities, 'minPayment') / i) * 100 : 0 }
     function getExpensesByCategory() {
       const map = {};
-      DATA.expenses.forEach(e => { map[e.category] = (map[e.category] || 0) + Number(e.amount) });
+      financialData.expenses.forEach(e => { map[e.category] = (map[e.category] || 0) + Number(e.amount) });
       return Object.entries(map).sort((a, b) => b[1] - a[1]);
     }
     function getBudgetVsActual() {
       const actual = {};
-      DATA.expenses.forEach(e => { actual[e.category] = (actual[e.category] || 0) + Number(e.amount) });
-      return DATA.budgets.map(b => ({ category: b.category, allocated: b.allocated, actual: actual[b.category] || 0, variance: b.allocated - (actual[b.category] || 0) }));
+      financialData.expenses.forEach(e => { actual[e.category] = (actual[e.category] || 0) + Number(e.amount) });
+      return financialData.budget.map(b => ({ category: b.category, allocated: b.allocated, actual: actual[b.category] || 0, variance: b.allocated - (actual[b.category] || 0) }));
     }
 
     // ═══════════════════════════════════════
@@ -1290,7 +1280,7 @@
       const expCats = getExpensesByCategory();
       drawPieChart('pieChart', expCats.map(e => e[1]), expCats.map(e => CATS[e[0]] || e[0]), COLORS);
       // Line chart
-      const hist = DATA.netWorthHistory;
+      const hist = financialData.history;
       drawLineChart('lineChart', hist.map(h => h.month), hist.map(h => h.value));
       // Budget bars
       const bars = document.getElementById('budgetBars');
@@ -1314,7 +1304,7 @@
     <div class="metrics-grid">
       <div class="metric-card green"><div class="metric-label">Monthly Active Income</div><div class="metric-value">${fmt(monthly)}</div><div class="metric-sub">Based on current active sources</div></div>
       <div class="metric-card blue"><div class="metric-label">Annual Projection</div><div class="metric-value">${fmt(monthly * 12)}</div></div>
-      <div class="metric-card purple"><div class="metric-label">Income Sources</div><div class="metric-value">${DATA.incomes.length}</div></div>
+      <div class="metric-card purple"><div class="metric-label">Income Sources</div><div class="metric-value">${financialData.income.length}</div></div>
     </div>
     <div class="form-section"><h3>Add Income Source</h3>
       <form id="incomeForm" onsubmit="addIncome(event)">
@@ -1338,17 +1328,17 @@
     }
     function renderIncomeTable() {
       const tb = document.getElementById('incomeTable'); if (!tb) return;
-      tb.innerHTML = DATA.incomes.sort((a, b) => new Date(b.startDate) - new Date(a.startDate)).map(i => {
+      tb.innerHTML = financialData.income.sort((a, b) => new Date(b.startDate) - new Date(a.startDate)).map(i => {
         const isActive = (!i.endDate || new Date(i.endDate) >= new Date()) && (!i.startDate || new Date(i.startDate) <= new Date());
         return `<tr style="${!isActive ? 'opacity:0.6' : ''}"><td>${i.source}${!isActive ? ' <span class="badge badge-warning" style="font-size:0.6rem">Inactive</span>' : ''}</td><td><span class="badge badge-primary">${INCOME_CATS[i.category] || i.category}</span></td><td>${fmt(i.amount)}</td><td style="text-transform:capitalize">${i.frequency.replace('_', ' ')}</td><td>${fmtDate(i.startDate)}</td><td>${i.endDate ? fmtDate(i.endDate) : '—'}</td><td>${fmt(monthlyAmount(i))}</td><td><button class="btn btn-sm btn-danger" onclick="deleteIncome(${i.id})">✕</button></td></tr>`
       }).join('');
     }
     function addIncome(e) {
       e.preventDefault(); const f = e.target; if (!validate(f)) return;
-      DATA.incomes.push({ id: ++nextId, source: f.incSource.value, category: f.incCategory.value, amount: Number(f.incAmount.value), frequency: f.incFrequency.value, startDate: f.incStart.value, endDate: f.incEnd.value });
-      f.reset(); f.incStart.value = new Date().toISOString().split('T')[0]; toast('Income source added'); saveData(); render();
+      financialData.income.push({ id: ++nextId, source: f.incSource.value, category: f.incCategory.value, amount: Number(f.incAmount.value), frequency: f.incFrequency.value, startDate: f.incStart.value, endDate: f.incEnd.value });
+      f.reset(); f.incStart.value = new Date().toISOString().split('T')[0]; toast('Income source added'); autoSave(financialData); render();
     }
-    function deleteIncome(id) { DATA.incomes = DATA.incomes.filter(i => i.id !== id); toast('Income removed', 'warning'); saveData(); render() }
+    function deleteIncome(id) { financialData.income = financialData.income.filter(i => i.id !== id); toast('Income removed', 'warning'); autoSave(financialData); render() }
 
     // ═══════════════════════════════════════
     // EXPENSES
@@ -1356,13 +1346,13 @@
     let expFilter = { search: '', category: '', method: '' };
     function renderExpenses(c) {
       const total = calcMonthlyExpenses();
-      const recurring = DATA.expenses.filter(e => e.recurring).reduce((s, e) => s + Number(e.amount), 0);
+      const recurring = financialData.expenses.filter(e => e.recurring).reduce((s, e) => s + Number(e.amount), 0);
       c.innerHTML = `
     <div class="metrics-grid">
       <div class="metric-card red"><div class="metric-label">Total Expenses</div><div class="metric-value">${fmt(total)}</div></div>
       <div class="metric-card orange"><div class="metric-label">Recurring</div><div class="metric-value">${fmt(recurring)}</div></div>
       <div class="metric-card blue"><div class="metric-label">One-Time</div><div class="metric-value">${fmt(total - recurring)}</div></div>
-      <div class="metric-card green"><div class="metric-label">Transactions</div><div class="metric-value">${DATA.expenses.length}</div></div>
+      <div class="metric-card green"><div class="metric-label">Transactions</div><div class="metric-value">${financialData.expenses.length}</div></div>
     </div>
     <div class="form-section"><h3>Add Expense</h3>
       <form id="expenseForm" onsubmit="addExpense(event)">
@@ -1391,7 +1381,7 @@
     }
     function renderExpTable() {
       const tb = document.getElementById('expTable'); if (!tb) return;
-      let items = DATA.expenses.slice();
+      let items = financialData.expenses.slice();
       if (expFilter.search) { const s = expFilter.search.toLowerCase(); items = items.filter(e => e.description.toLowerCase().includes(s)) }
       if (expFilter.category) items = items.filter(e => e.category === expFilter.category);
       if (expFilter.method) items = items.filter(e => e.paymentMethod === expFilter.method);
@@ -1400,16 +1390,16 @@
     }
     function addExpense(e) {
       e.preventDefault(); const f = e.target; if (!validate(f)) return;
-      DATA.expenses.push({ id: ++nextId, description: f.expDesc.value, category: f.expCategory.value, amount: Number(f.expAmount.value), date: f.expDate.value, recurring: f.expRecurring.checked, paymentMethod: f.expMethod.value });
-      f.reset(); f.expDate.value = new Date().toISOString().split('T')[0]; toast('Expense added'); saveData(); renderExpTable();
+      financialData.expenses.push({ id: ++nextId, description: f.expDesc.value, category: f.expCategory.value, amount: Number(f.expAmount.value), date: f.expDate.value, recurring: f.expRecurring.checked, paymentMethod: f.expMethod.value });
+      f.reset(); f.expDate.value = new Date().toISOString().split('T')[0]; toast('Expense added'); autoSave(financialData); renderExpTable();
     }
-    function deleteExpense(id) { DATA.expenses = DATA.expenses.filter(e => e.id !== id); toast('Expense removed', 'warning'); saveData(); renderExpTable() }
+    function deleteExpense(id) { financialData.expenses = financialData.expenses.filter(e => e.id !== id); toast('Expense removed', 'warning'); autoSave(financialData); renderExpTable() }
 
     // ═══════════════════════════════════════
     // BUDGETS
     // ═══════════════════════════════════════
     function renderBudgets(c) {
-      const totalBudget = sumBy(DATA.budgets, 'allocated');
+      const totalBudget = sumBy(financialData.budget, 'allocated');
       const totalSpent = calcMonthlyExpenses();
       const remaining = totalBudget - totalSpent;
       const income = calcMonthlyIncome();
@@ -1449,24 +1439,24 @@
     }
     function addBudget(e) {
       e.preventDefault(); const cat = document.getElementById('budCat').value, amt = Number(document.getElementById('budAmount').value);
-      const existing = DATA.budgets.find(b => b.category === cat);
-      if (existing) { existing.allocated = amt } else { DATA.budgets.push({ category: cat, allocated: amt }) }
-      toast('Budget updated'); saveData(); render();
+      const existing = financialData.budget.find(b => b.category === cat);
+      if (existing) { existing.allocated = amt } else { financialData.budget.push({ category: cat, allocated: amt }) }
+      toast('Budget updated'); autoSave(financialData); render();
     }
-    function deleteBudget(cat) { DATA.budgets = DATA.budgets.filter(b => b.category !== cat); toast('Budget removed', 'warning'); saveData(); render() }
+    function deleteBudget(cat) { financialData.budget = financialData.budget.filter(b => b.category !== cat); toast('Budget removed', 'warning'); autoSave(financialData); render() }
 
     // ═══════════════════════════════════════
     // INVESTMENTS
     // ═══════════════════════════════════════
     function renderInvestments(c) {
-      const totalCost = sumBy(DATA.investments, 'costBasis'), totalVal = sumBy(DATA.investments, 'currentValue');
+      const totalCost = sumBy(financialData.investments, 'costBasis'), totalVal = sumBy(financialData.investments, 'currentValue');
       const totalReturn = totalCost ? ((totalVal - totalCost) / totalCost) * 100 : 0;
       c.innerHTML = `
     <div class="metrics-grid">
       <div class="metric-card blue"><div class="metric-label">Portfolio Value</div><div class="metric-value">${fmt(totalVal)}</div></div>
       <div class="metric-card purple"><div class="metric-label">Cost Basis</div><div class="metric-value">${fmt(totalCost)}</div></div>
       <div class="metric-card ${totalReturn >= 0 ? 'green' : 'red'}"><div class="metric-label">Total Return</div><div class="metric-value">${totalReturn >= 0 ? '+' : ''}${fmtPct(totalReturn)}</div><div class="metric-sub">${totalReturn >= 0 ? '+' : '-'}${fmt(totalVal - totalCost)}</div></div>
-      <div class="metric-card orange"><div class="metric-label">Holdings</div><div class="metric-value">${DATA.investments.length}</div></div>
+      <div class="metric-card orange"><div class="metric-label">Holdings</div><div class="metric-value">${financialData.investments.length}</div></div>
     </div>
     <div class="charts-grid">
       <div class="chart-container"><div class="card-header"><span class="card-title">Asset Allocation</span></div><canvas id="investPie" style="height:280px"></canvas></div>
@@ -1486,7 +1476,7 @@
     </div>
   `;
       // Allocation pie
-      const byCat = {}; DATA.investments.forEach(i => { byCat[i.category] = (byCat[i.category] || 0) + i.currentValue });
+      const byCat = {}; financialData.investments.forEach(i => { byCat[i.category] = (byCat[i.category] || 0) + i.currentValue });
       const catEntries = Object.entries(byCat).sort((a, b) => b[1] - a[1]);
       drawPieChart('investPie', catEntries.map(e => e[1]), catEntries.map(e => INVEST_CATS[e[0]] || e[0]), COLORS);
       // Diversification bars
@@ -1499,8 +1489,8 @@
     }
     function renderInvTable() {
       const tb = document.getElementById('invTable'); if (!tb) return;
-      const tv = sumBy(DATA.investments, 'currentValue');
-      tb.innerHTML = DATA.investments.map(i => {
+      const tv = sumBy(financialData.investments, 'currentValue');
+      tb.innerHTML = financialData.investments.map(i => {
         const ret = i.costBasis ? ((i.currentValue - i.costBasis) / i.costBasis) * 100 : 0;
         const pctPort = tv ? (i.currentValue / tv) * 100 : 0;
         return `<tr><td>${i.name}</td><td><span class="badge badge-primary">${INVEST_CATS[i.category] || i.category}</span></td><td>${fmt(i.costBasis)}</td><td>${fmt(i.currentValue)}</td><td class="${ret >= 0 ? 'metric-sub positive' : 'metric-sub negative'}">${ret >= 0 ? '+' : ''}${fmtPct(ret)}</td><td>${fmtPct(pctPort)}</td><td><button class="btn btn-sm btn-danger" onclick="deleteInvestment(${i.id})">✕</button></td></tr>`;
@@ -1508,17 +1498,17 @@
     }
     function addInvestment(e) {
       e.preventDefault(); const f = e.target; if (!validate(f)) return;
-      DATA.investments.push({ id: ++nextId, name: f.invName.value, category: f.invCat.value, costBasis: Number(f.invCost.value), currentValue: Number(f.invVal.value), date: f.invDate.value });
-      f.reset(); f.invDate.value = new Date().toISOString().split('T')[0]; toast('Investment added'); saveData(); render();
+      financialData.investments.push({ id: ++nextId, name: f.invName.value, category: f.invCat.value, costBasis: Number(f.invCost.value), currentValue: Number(f.invVal.value), date: f.invDate.value });
+      f.reset(); f.invDate.value = new Date().toISOString().split('T')[0]; toast('Investment added'); autoSave(financialData); render();
     }
-    function deleteInvestment(id) { DATA.investments = DATA.investments.filter(i => i.id !== id); toast('Investment removed', 'warning'); saveData(); render() }
+    function deleteInvestment(id) { financialData.investments = financialData.investments.filter(i => i.id !== id); toast('Investment removed', 'warning'); autoSave(financialData); render() }
 
     // ═══════════════════════════════════════
     // DEBTS
     // ═══════════════════════════════════════
     function renderDebts(c) {
-      const totalDebt = calcTotalDebts(); const totalMin = sumBy(DATA.debts, 'minPayment');
-      const avgRate = DATA.debts.length ? DATA.debts.reduce((s, d) => s + Number(d.interestRate), 0) / DATA.debts.length : 0;
+      const totalDebt = calcTotalDebts(); const totalMin = sumBy(financialData.liabilities, 'minPayment');
+      const avgRate = financialData.liabilities.length ? financialData.liabilities.reduce((s, d) => s + Number(d.interestRate), 0) / financialData.liabilities.length : 0;
       c.innerHTML = `
     <div class="metrics-grid">
       <div class="metric-card red"><div class="metric-label">Total Debt</div><div class="metric-value">${fmt(totalDebt)}</div></div>
@@ -1542,7 +1532,7 @@
     </div>
   `;
       const db = document.getElementById('debtBars');
-      DATA.debts.forEach((d, i) => {
+      financialData.liabilities.forEach((d, i) => {
         const pct = totalDebt ? (d.balance / totalDebt) * 100 : 0;
         db.innerHTML += `<div class="budget-row"><div class="budget-info"><span>${d.name} (${fmtPct(d.interestRate)} APR)</span><span>${fmt(d.balance)}</span></div><div class="budget-bar"><div class="budget-fill red" style="width:${pct}%;background:${COLORS[i % COLORS.length]}">${pct.toFixed(0)}%</div></div></div>`;
       });
@@ -1550,7 +1540,7 @@
     }
     function renderDebtTable() {
       const tb = document.getElementById('debtTable'); if (!tb) return;
-      tb.innerHTML = DATA.debts.map(d => {
+      tb.innerHTML = financialData.liabilities.map(d => {
         const months = d.minPayment > 0 ? Math.ceil(d.balance / d.minPayment) : 0;
         const years = Math.floor(months / 12), rem = months % 12;
         const payoff = months ? `~${years ? years + 'y ' : ''}${rem}m` : 'N/A';
@@ -1559,10 +1549,10 @@
     }
     function addDebt(e) {
       e.preventDefault(); const f = e.target; if (!validate(f)) return;
-      DATA.debts.push({ id: ++nextId, name: f.debtName.value, type: f.debtType.value, balance: Number(f.debtBal.value), interestRate: Number(f.debtRate.value), minPayment: Number(f.debtMin.value), startDate: f.debtDate.value });
-      f.reset(); toast('Debt added'); saveData(); render();
+      financialData.liabilities.push({ id: ++nextId, name: f.debtName.value, type: f.debtType.value, balance: Number(f.debtBal.value), interestRate: Number(f.debtRate.value), minPayment: Number(f.debtMin.value), startDate: f.debtDate.value });
+      f.reset(); toast('Debt added'); autoSave(financialData); render();
     }
-    function deleteDebt(id) { DATA.debts = DATA.debts.filter(d => d.id !== id); toast('Debt removed', 'warning'); saveData(); render() }
+    function deleteDebt(id) { financialData.liabilities = financialData.liabilities.filter(d => d.id !== id); toast('Debt removed', 'warning'); autoSave(financialData); render() }
 
     // ═══════════════════════════════════════
     // GOALS
@@ -1583,7 +1573,7 @@
     <div class="goals-grid" id="goalsGrid"></div>
   `;
       const grid = document.getElementById('goalsGrid');
-      DATA.goals.forEach(g => {
+      financialData.goals.forEach(g => {
         const pct = g.targetAmount ? Math.min((g.currentAmount / g.targetAmount) * 100, 100) : 0;
         const remaining = g.targetAmount - g.currentAmount;
         const now = new Date(), dl = new Date(g.deadline);
@@ -1602,10 +1592,10 @@
     }
     function addGoal(e) {
       e.preventDefault(); const f = e.target; if (!validate(f)) return;
-      DATA.goals.push({ id: ++nextId, name: f.goalName.value, category: f.goalCat.value, targetAmount: Number(f.goalTarget.value), currentAmount: Number(f.goalCurrent.value), deadline: f.goalDeadline.value });
-      f.reset(); toast('Goal added'); saveData(); render();
+      financialData.goals.push({ id: ++nextId, name: f.goalName.value, category: f.goalCat.value, targetAmount: Number(f.goalTarget.value), currentAmount: Number(f.goalCurrent.value), deadline: f.goalDeadline.value });
+      f.reset(); toast('Goal added'); autoSave(financialData); render();
     }
-    function deleteGoal(id) { DATA.goals = DATA.goals.filter(g => g.id !== id); toast('Goal removed', 'warning'); saveData(); render() }
+    function deleteGoal(id) { financialData.goals = financialData.goals.filter(g => g.id !== id); toast('Goal removed', 'warning'); autoSave(financialData); render() }
 
     // ═══════════════════════════════════════
     // REPORTS
@@ -1643,7 +1633,7 @@
   `;
       // Category table
       const catTb = document.getElementById('reportCatTable');
-      const expCats = getExpensesByCategory(); const budgetMap = {}; DATA.budgets.forEach(b => { budgetMap[b.category] = b.allocated });
+      const expCats = getExpensesByCategory(); const budgetMap = {}; financialData.budget.forEach(b => { budgetMap[b.category] = b.allocated });
       expCats.forEach(([cat, amt]) => {
         const pct = expenses ? (amt / expenses) * 100 : 0;
         const bud = budgetMap[cat];
@@ -1652,18 +1642,18 @@
       });
       // Income table
       const incTb = document.getElementById('reportIncTable');
-      DATA.incomes.forEach(i => {
+      financialData.income.forEach(i => {
         const m = monthlyAmount(i); const pct = income ? (m / income) * 100 : 0;
         incTb.innerHTML += `<tr><td>${i.source}</td><td>${fmt(m)}</td><td>${fmt(m * 12)}</td><td>${fmtPct(pct)}</td></tr>`;
       });
     }
     function exportCSV() {
       let csv = 'Type,Name,Category,Amount,Date,Extra\n';
-      DATA.incomes.forEach(i => { csv += `"Income","${i.source}","${INCOME_CATS[i.category] || i.category}",${i.amount},"${i.startDate}",${i.frequency}\n` });
-      DATA.expenses.forEach(e => { csv += `"Expense","${e.description}","${CATS[e.category] || e.category}",${e.amount},"${e.date}",${e.paymentMethod}\n` });
-      DATA.investments.forEach(i => { csv += `"Investment","${i.name}","${INVEST_CATS[i.category] || i.category}",${i.currentValue},"${i.date}","Cost: ${i.costBasis}"\n` });
-      DATA.debts.forEach(d => { csv += `"Debt","${d.name}","${d.type}",${d.balance},"${d.startDate}","Rate: ${d.interestRate}%"\n` });
-      DATA.goals.forEach(g => { csv += `"Goal","${g.name}","${g.category}",${g.currentAmount},"${g.deadline}","Target: ${g.targetAmount}"\n` });
+      financialData.income.forEach(i => { csv += `"Income","${i.source}","${INCOME_CATS[i.category] || i.category}",${i.amount},"${i.startDate}",${i.frequency}\n` });
+      financialData.expenses.forEach(e => { csv += `"Expense","${e.description}","${CATS[e.category] || e.category}",${e.amount},"${e.date}",${e.paymentMethod}\n` });
+      financialData.investments.forEach(i => { csv += `"Investment","${i.name}","${INVEST_CATS[i.category] || i.category}",${i.currentValue},"${i.date}","Cost: ${i.costBasis}"\n` });
+      financialData.liabilities.forEach(d => { csv += `"Liability","${d.name}","${d.type}",${d.balance},"${d.startDate}","Rate: ${d.interestRate}%"\n` });
+      financialData.goals.forEach(g => { csv += `"Goal","${g.name}","${g.category}",${g.currentAmount},"${g.deadline}","Target: ${g.targetAmount}"\n` });
 
       const blob = new Blob([csv], { type: 'text/csv' }); const a = document.createElement('a');
       a.href = URL.createObjectURL(blob); a.download = `finance_export_${new Date().toISOString().slice(0, 10)}.csv`; a.click();
@@ -1673,23 +1663,50 @@
     // ═══════════════════════════════════════
     // INIT & PERSISTENCE
     // ═══════════════════════════════════════
-    function saveData() { localStorage.setItem('financeFlowData', JSON.stringify(DATA)); }
+    // Persistence functions restored
     function loadData() {
-      const saved = localStorage.getItem('financeFlowData');
+      const DATA_VERSION = 'v3-real-import';
+      const saved = localStorage.getItem('personalFinanceData');
       if (saved) {
         try {
           const parsed = JSON.parse(saved);
-          Object.keys(DATA).forEach(k => { if (parsed[k]) DATA[k] = parsed[k] });
-          const ids = [
-            ...(DATA.incomes || []).map(i => i.id),
-            ...(DATA.expenses || []).map(e => e.id),
-            ...(DATA.investments || []).map(i => i.id),
-            ...(DATA.debts || []).map(d => d.id),
-            ...(DATA.goals || []).map(g => g.id)
-          ];
-          if (ids.length) nextId = Math.max(...ids) + 1;
-        } catch (e) { console.error('Failed to load data', e) }
+          // Only load from localStorage if it matches the current version
+          if (parsed._dataVersion === DATA_VERSION) {
+            financialData = { ...financialData, ...parsed };
+            // Ensure arrays exist
+            if (!financialData.income) financialData.income = [];
+            if (!financialData.expenses) financialData.expenses = [];
+            if (!financialData.assets) financialData.assets = [];
+            if (!financialData.liabilities) financialData.liabilities = [];
+            if (!financialData.investments) financialData.investments = [];
+            if (!financialData.goals) financialData.goals = [];
+            if (!financialData.budget) financialData.budget = [];
+            return; // Successfully loaded saved data
+          }
+        } catch (e) { console.error('Data load failed', e); }
       }
+      // First load or version mismatch: save the hardcoded data
+      financialData._dataVersion = DATA_VERSION;
+      saveData();
+    }
+    function saveData() {
+      localStorage.setItem('personalFinanceData', JSON.stringify(financialData));
+    }
+    function autoSave(data) {
+      if (data) financialData = data;
+      saveData();
+      // Show saved indicator
+      const ind = document.getElementById('saveIndicator') || createSaveIndicator();
+      ind.classList.add('visible');
+      setTimeout(() => ind.classList.remove('visible'), 2000);
+    }
+    function createSaveIndicator() {
+      const div = document.createElement('div');
+      div.id = 'saveIndicator';
+      div.textContent = 'Saved';
+      div.style.cssText = 'position:fixed;bottom:20px;right:20px;background:var(--success);color:#fff;padding:8px 16px;border-radius:20px;opacity:0;transition:opacity 0.3s;pointer-events:none;z-index:9999';
+      document.body.appendChild(div);
+      return div;
     }
 
 

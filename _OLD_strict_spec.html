@@ -1,0 +1,1190 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Personal Finance Manager</title>
+    <style>
+        :root {
+            --primary: #1e88e5;
+            --success: #4caf50;
+            --warning: #ff9800;
+            --danger: #f44336;
+            --bg: #f5f5f5;
+            --card-bg: #ffffff;
+            --text: #333333;
+            --border: #e0e0e0;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            margin: 0;
+            padding-top: 110px;
+        }
+
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: var(--primary);
+            color: white;
+            padding: 0.5rem 1rem 0;
+            z-index: 1000;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-bottom: 0.5rem;
+        }
+
+        .tab-nav {
+            display: flex;
+            overflow-x: auto;
+            gap: 2px;
+        }
+
+        .tab-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            color: white;
+            padding: 10px 15px;
+            cursor: pointer;
+            border-radius: 4px 4px 0 0;
+            transition: background 0.2s;
+            white-space: nowrap;
+        }
+
+        .tab-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .tab-btn.active {
+            background: white;
+            color: var(--primary);
+            font-weight: bold;
+        }
+
+        .save-indicator {
+            background: var(--success);
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .tab-content {
+            display: none;
+            padding: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .tab-content.active {
+            display: block;
+            animation: fadein 0.3s;
+        }
+
+        @keyframes fadein {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+        .metric-card {
+            background: var(--card-bg);
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .metric {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            padding-bottom: 5px;
+            border-bottom: 1px solid var(--bg);
+        }
+
+        .metric label {
+            color: #666;
+        }
+
+        .amount-positive {
+            color: var(--success);
+            font-weight: bold;
+        }
+
+        .amount-negative {
+            color: var(--danger);
+            font-weight: bold;
+        }
+
+        .amount-large {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--primary);
+        }
+
+        .form-section {
+            background: var(--card-bg);
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            margin-bottom: 10px;
+        }
+
+        .form-group label {
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        input,
+        select,
+        textarea {
+            padding: 8px;
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            font-family: inherit;
+        }
+
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-secondary {
+            background: #757575;
+            color: white;
+        }
+
+        .btn-danger {
+            background: var(--danger);
+            color: white;
+        }
+
+        .btn-edit {
+            background: #ffb74d;
+            color: #fff;
+            padding: 4px 8px;
+            font-size: 0.8rem;
+            margin-right: 5px;
+        }
+
+        .btn-delete {
+            background: #e57373;
+            color: #fff;
+            padding: 4px 8px;
+            font-size: 0.8rem;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: var(--card-bg);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .data-table th,
+        .data-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .data-table th {
+            background: #e3f2fd;
+            color: var(--primary);
+            font-weight: 600;
+        }
+
+        .data-table tr:hover {
+            background: #f1f8ff;
+        }
+
+        .no-data {
+            text-align: center;
+            color: #888;
+            padding: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+
+            .tab-nav {
+                padding-bottom: 0;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <div class="header-content">
+            <h1>💰 Personal Finance Manager</h1>
+            <div id="saveIndicator" class="save-indicator">Saved</div>
+        </div>
+        <nav class="tab-nav">
+            <button class="tab-btn active" onclick="showTab('dashboard')">📊 Dashboard</button>
+            <button class="tab-btn" onclick="showTab('income')">💰 Income</button>
+            <button class="tab-btn" onclick="showTab('expenses')">💳 Expenses</button>
+            <button class="tab-btn" onclick="showTab('budget')">📈 Budget</button>
+            <button class="tab-btn" onclick="showTab('assets')">🏦 Assets</button>
+            <button class="tab-btn" onclick="showTab('liabilities')">💸 Liabilities</button>
+            <button class="tab-btn" onclick="showTab('investments')">📊 Investments</button>
+            <button class="tab-btn" onclick="showTab('goals')">🎯 Goals</button>
+            <button class="tab-btn" onclick="showTab('settings')">⚙️ Settings</button>
+        </nav>
+    </header>
+
+    <div id="dashboard" class="tab-content active">
+        <h2>Financial Dashboard</h2>
+        <div class="metrics-grid">
+            <div class="metric-card">
+                <h3>Current Month</h3>
+                <div class="metric"><label>Total Income:</label><span id="dashTotalIncome"
+                        class="amount-positive">£0.00</span></div>
+                <div class="metric"><label>Total Expenses:</label><span id="dashTotalExpenses"
+                        class="amount-negative">£0.00</span></div>
+                <div class="metric"><label>Net Savings:</label><span id="dashNetSavings">£0.00</span></div>
+                <div class="metric"><label>Savings Rate:</label><span id="dashSavingsRate">0%</span></div>
+            </div>
+            <div class="metric-card">
+                <h3>Net Worth</h3>
+                <div class="metric"><label>Total Assets:</label><span id="dashTotalAssets"
+                        class="amount-positive">£0.00</span></div>
+                <div class="metric"><label>Total Liabilities:</label><span id="dashTotalLiabilities"
+                        class="amount-negative">£0.00</span></div>
+                <div class="metric"><label>Net Worth:</label><span id="dashNetWorth" class="amount-large">£0.00</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="income" class="tab-content">
+        <h2>Income Tracker</h2>
+        <div class="form-section">
+            <h3>Add Income</h3>
+            <form id="incomeForm" onsubmit="addIncome(event)">
+                <input type="hidden" id="editingIncomeId">
+                <div class="form-row">
+                    <div class="form-group"><label for="incomeDate">Date *</label><input type="date" id="incomeDate"
+                            required></div>
+                    <div class="form-group"><label for="incomeSource">Source *</label><input type="text"
+                            id="incomeSource" placeholder="e.g., Monthly Salary" required></div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group"><label for="incomeCategory">Category *</label>
+                        <select id="incomeCategory" required>
+                            <option value="">Select...</option>
+                            <option value="Primary Salary">Primary Salary</option>
+                            <option value="Secondary Salary">Secondary Salary</option>
+                            <option value="Bonus">Bonus</option>
+                            <option value="Investment">Investment</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+                    <div class="form-group"><label for="incomeAmount">Amount (£) *</label><input type="number"
+                            id="incomeAmount" step="0.01" min="0" required></div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group"><label>Frequency</label><select id="incomeFrequency">
+                            <option value="Monthly">Monthly</option>
+                            <option value="One-time">One-time</option>
+                        </select></div>
+                    <div class="form-group"><label>Tax Status</label><select id="incomeTaxStatus">
+                            <option value="Taxable">Taxable</option>
+                            <option value="Tax-Free">Tax-Free</option>
+                        </select></div>
+                </div>
+                <div class="form-group"><label>Notes</label><textarea id="incomeNotes" rows="2"></textarea></div>
+                <button type="submit" class="btn btn-primary">Add Income</button>
+                <button type="button" class="btn btn-secondary"
+                    onclick="document.getElementById('incomeForm').reset()">Clear</button>
+            </form>
+        </div>
+        <div class="data-section">
+            <h3>Income History</h3>
+            <div id="incomeList"></div>
+        </div>
+    </div>
+
+    <!-- PLACEHOLDER FOR OTHER SECTIONS -->
+    <div id="expenses" class="tab-content">
+        <h2>Expenses</h2>
+        <div class="form-section">
+            <h3>Add Expense</h3>
+            <form id="expenseForm" onsubmit="addExpense(event)">
+                <input type="hidden" id="editingExpenseId">
+                <div class="form-row">
+                    <div class="form-group"><label>Date *</label><input type="date" id="expenseDate" required></div>
+                    <div class="form-group"><label>Description *</label><input type="text" id="expenseDesc" required>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group"><label>Category *</label>
+                        <select id="expenseCategory" required>
+                            <option value="">Select...</option>
+                            <option value="Housing">Housing</option>
+                            <option value="Transportation">Transportation</option>
+                            <option value="Food & Dining">Food & Dining</option>
+                            <option value="Utilities">Utilities</option>
+                            <option value="Healthcare">Healthcare</option>
+                            <option value="Entertainment">Entertainment</option>
+                            <option value="Personal">Personal</option>
+                            <option value="Education">Education</option>
+                            <option value="Debt">Debt</option>
+                            <option value="Savings">Savings</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+                    <div class="form-group"><label>Amount (£) *</label><input type="number" id="expenseAmount"
+                            step="0.01" min="0" required></div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group"><label>Payment Method</label><select id="expensePayment">
+                            <option value="Debit Card">Debit Card</option>
+                            <option value="Credit Card">Credit Card</option>
+                            <option value="Cash">Cash</option>
+                            <option value="Bank Transfer">Bank Transfer</option>
+                        </select></div>
+                    <div class="form-group" style="flex-direction:row; gap:20px; align-items:center; padding-top:25px">
+                        <label><input type="checkbox" id="expenseRecurring"> Recurring</label>
+                        <label><input type="checkbox" id="expenseTax"> Tax Deductible</label>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group"><label>Notes</label><input type="text" id="expenseNotes"></div>
+                </div>
+                <button type="submit" class="btn btn-warning">Add Expense</button>
+                <button type="button" class="btn btn-secondary"
+                    onclick="document.getElementById('expenseForm').reset()">Clear</button>
+            </form>
+        </div>
+        <div class="data-section">
+            <h3>Expense History</h3>
+            <div id="expenseList"></div>
+        </div>
+    </div>
+    <div id="budget" class="tab-content">
+        <h2>Monthly Budget</h2>
+        <div class="form-section">
+            <h3>Set Category Budget</h3>
+            <form onsubmit="setBudget(event)">
+                <div class="form-row">
+                    <div class="form-group"><label>Category</label>
+                        <select id="budgetCategory" required>
+                            <option value="">Select...</option>
+                            <option value="Housing">Housing</option>
+                            <option value="Transportation">Transportation</option>
+                            <option value="Food & Dining">Food & Dining</option>
+                            <option value="Utilities">Utilities</option>
+                            <option value="Healthcare">Healthcare</option>
+                            <option value="Entertainment">Entertainment</option>
+                            <option value="Personal">Personal</option>
+                            <option value="Education">Education</option>
+                            <option value="Debt">Debt</option>
+                            <option value="Savings">Savings</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+                    <div class="form-group"><label>Monthly Limit (£)</label><input type="number" id="budgetAmount"
+                            step="10" min="0" required></div>
+                </div>
+                <button type="submit" class="btn btn-primary">Set Budget</button>
+            </form>
+        </div>
+        <div class="data-section">
+            <h3>Budget Status (Current Month)</h3>
+            <div id="budgetList"></div>
+        </div>
+    </div>
+    <div id="assets" class="tab-content">
+        <h2>Assets</h2>
+        <div class="form-section">
+            <h3>Add Asset</h3>
+            <form id="assetForm" onsubmit="addAsset(event)">
+                <input type="hidden" id="editingAssetId">
+                <div class="form-row">
+                    <div class="form-group"><label>Asset Name *</label><input type="text" id="assetName" required></div>
+                    <div class="form-group"><label>Type</label><select id="assetType">
+                            <option value="Cash">Cash</option>
+                            <option value="Property">Property</option>
+                            <option value="Vehicle">Vehicle</option>
+                            <option value="Electronics">Electronics</option>
+                            <option value="Other">Other</option>
+                        </select></div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group"><label>Value (£) *</label><input type="number" id="assetValue" step="0.01"
+                            min="0" required></div>
+                    <div class="form-group"><label>Liquidity</label><select id="assetLiquidity">
+                            <option value="High">High</option>
+                            <option value="Medium">Medium</option>
+                            <option value="Low">Low</option>
+                        </select></div>
+                </div>
+                <button type="submit" class="btn btn-primary">Save Asset</button>
+            </form>
+        </div>
+        <div class="data-section">
+            <h3>My Assets</h3>
+            <div id="assetList"></div>
+        </div>
+    </div>
+    <div id="liabilities" class="tab-content">
+        <h2>Liabilities</h2>
+        <div class="form-section">
+            <h3>Add Liability</h3>
+            <form id="liabilityForm" onsubmit="addLiability(event)">
+                <input type="hidden" id="editingLiabilityId">
+                <div class="form-row">
+                    <div class="form-group"><label>Creditor *</label><input type="text" id="liabCreditor" required>
+                    </div>
+                    <div class="form-group"><label>Type</label><select id="liabType">
+                            <option value="Credit Card">Credit Card</option>
+                            <option value="Loan">Loan</option>
+                            <option value="Mortgage">Mortgage</option>
+                            <option value="Other">Other</option>
+                        </select></div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group"><label>Current Balance (£) *</label><input type="number" id="liabBalance"
+                            step="0.01" min="0" required></div>
+                    <div class="form-group"><label>Interest Rate (%)</label><input type="number" id="liabRate"
+                            step="0.1" min="0"></div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group"><label>Min Payment (£)</label><input type="number" id="liabMin" step="0.01"
+                            min="0"></div>
+                    <div class="form-group"><label>Start Date</label><input type="date" id="liabDate"></div>
+                </div>
+                <button type="submit" class="btn btn-danger">Save Liability</button>
+            </form>
+        </div>
+        <div class="data-section">
+            <h3>Outstanding Liabilities</h3>
+            <div id="liabilityList"></div>
+        </div>
+    </div>
+    <div id="investments" class="tab-content">
+        <h2>Investments</h2>
+        <div class="form-section">
+            <h3>Add Investment</h3>
+            <form id="investForm" onsubmit="addInvestment(event)">
+                <input type="hidden" id="editingInvestId">
+                <div class="form-row">
+                    <div class="form-group"><label>Name *</label><input type="text" id="invName" required></div>
+                    <div class="form-group"><label>Ticker</label><input type="text" id="invTicker"></div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group"><label>Type</label><select id="invType">
+                            <option value="Stocks">Stocks</option>
+                            <option value="Bonds">Bonds</option>
+                            <option value="Crypto">Crypto</option>
+                            <option value="Real Estate">Real Estate</option>
+                            <option value="Other">Other</option>
+                        </select></div>
+                    <div class="form-group"><label>Quantity</label><input type="number" id="invQty" step="0.0001"
+                            min="0" required></div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group"><label>Cost Basis</label><input type="number" id="invCost" step="0.01">
+                    </div>
+                    <div class="form-group"><label>Current Price *</label><input type="number" id="invPrice" step="0.01"
+                            required></div>
+                </div>
+                <button type="submit" class="btn btn-primary">Save Investment</button>
+            </form>
+        </div>
+        <div class="data-section">
+            <h3>Portfolio</h3>
+            <div id="investList"></div>
+        </div>
+    </div>
+    <div id="goals" class="tab-content">
+        <h2>Goals</h2>
+        <div class="form-section">
+            <h3>Add Financial Goal</h3>
+            <form id="goalForm" onsubmit="addGoal(event)">
+                <input type="hidden" id="editingGoalId">
+                <div class="form-row">
+                    <div class="form-group"><label>Goal Name *</label><input type="text" id="goalName" required></div>
+                    <div class="form-group"><label>Type</label><select id="goalType">
+                            <option value="Emergency Fund">Emergency Fund</option>
+                            <option value="Purchase">Purchase</option>
+                            <option value="Retirement">Retirement</option>
+                            <option value="Debt Payoff">Debt Payoff</option>
+                            <option value="Other">Other</option>
+                        </select></div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group"><label>Target Amount (£) *</label><input type="number" id="goalTarget"
+                            step="0.01" min="0" required></div>
+                    <div class="form-group"><label>Current Saved (£)</label><input type="number" id="goalCurrent"
+                            step="0.01" min="0" required></div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group"><label>Deadline</label><input type="date" id="goalDate"></div>
+                    <div class="form-group"><label>Monthly Contribution</label><input type="number" id="goalContrib"
+                            step="0.01"></div>
+                </div>
+                <button type="submit" class="btn btn-success">Save Goal</button>
+            </form>
+        </div>
+        <div class="data-section">
+            <h3>My Goals</h3>
+            <div id="goalList"></div>
+        </div>
+    </div>
+
+    <div id="settings" class="tab-content">
+        <h2>⚙️ Settings</h2>
+        <div class="settings-section">
+            <h3>📊 Data Statistics</h3>
+            <div class="stat-grid">
+                <div class="stat"><label>Total Entries:</label><span id="totalEntriesDisplay">0</span></div>
+                <div class="stat"><label>Last Updated:</label><span id="lastUpdatedDisplay">-</span></div>
+                <div class="stat"><label>Storage Used:</label><span id="storageUsedDisplay">0 KB</span></div>
+            </div>
+        </div>
+        <div class="settings-section">
+            <h3>Management</h3>
+            <button onclick="exportDataJSON()" class="btn btn-primary">📥 Export JSON</button>
+            <button onclick="exportExpensesCSV()" class="btn btn-secondary">📊 Export Expenses CSV</button>
+            <input type="file" id="importFileInput" accept=".json" onchange="importDataJSON(event)"
+                style="display:none;">
+            <button onclick="document.getElementById('importFileInput').click()" class="btn btn-secondary">📤 Import
+                JSON</button>
+            <button onclick="clearAllData()" class="btn btn-danger" style="margin-top:10px">🗑️ Clear All Data</button>
+        </div>
+    </div>
+
+    <script>
+        // CORE FUNCTIONS
+        function showTab(id) {
+            document.querySelectorAll('.tab-content').forEach(d => d.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+            event.target.classList.add('active'); // Note: 'event' usage assumes inline onclick
+        }
+
+        function initializeData() {
+            return {
+                income: [], expenses: [], assets: [], liabilities: [], investments: [], budget: {}, goals: [],
+                settings: { currency: 'GBP', dateFormat: 'DD/MM/YYYY', theme: 'light', defaultView: 'dashboard' },
+                metadata: { createdAt: new Date().toISOString(), lastUpdated: new Date().toISOString(), version: '1.0' }
+            };
+        }
+        function loadData() {
+            try {
+                const stored = localStorage.getItem('personalFinanceData');
+                return stored ? JSON.parse(stored) : initializeData();
+            } catch (e) { console.error(e); return initializeData(); }
+        }
+        function saveData(data) {
+            try {
+                data.metadata.lastUpdated = new Date().toISOString();
+                localStorage.setItem('personalFinanceData', JSON.stringify(data));
+                showSaveIndicator();
+                return true;
+            } catch (e) { alert('Save Error: ' + e.message); return false; }
+        }
+        function showSaveIndicator(msg = 'Saved', err = false) {
+            const el = document.getElementById('saveIndicator');
+            el.textContent = msg + ' at ' + new Date().toLocaleTimeString();
+            el.style.background = err ? '#f44336' : '#4caf50';
+            el.style.opacity = '1';
+            setTimeout(() => el.style.opacity = '0', 2000);
+        }
+        function generateId() { return Date.now() + Math.random(); }
+        function formatDate(d) { return new Date(d).toLocaleDateString('en-GB'); }
+
+        // APP INIT
+        window.addEventListener('DOMContentLoaded', () => {
+            const data = loadData();
+            if (!localStorage.getItem('personalFinanceData')) saveData(data);
+            displayDashboard(data);
+            displayIncome(data.income);
+            displayExpenses(data.expenses);
+            displayBudget(data);
+            displayAssets(data.assets);
+            displayLiabilities(data.liabilities);
+            displayInvestments(data.investments);
+            displayGoals(data.goals);
+            updateDataInfo(data);
+            autoBackup();
+        });
+
+        // INCOME
+        function addIncome(e) {
+            e.preventDefault();
+            const data = loadData();
+            const id = document.getElementById('editingIncomeId').value; // Handle Edit logic? Spec has separate editIncome/updateIncome functions.
+            // Simplified for now based on 'addIncome' spec
+            if (id) { updateIncome(Number(id)); return; } // Hook for update
+
+            const item = {
+                id: generateId(),
+                date: document.getElementById('incomeDate').value,
+                source: document.getElementById('incomeSource').value,
+                category: document.getElementById('incomeCategory').value,
+                amount: parseFloat(document.getElementById('incomeAmount').value),
+                frequency: document.getElementById('incomeFrequency').value,
+                taxStatus: document.getElementById('incomeTaxStatus').value,
+                notes: document.getElementById('incomeNotes').value,
+                createdAt: new Date().toISOString(), updatedAt: new Date().toISOString()
+            };
+            data.income.push(item);
+            if (saveData(data)) { displayIncome(data.income); displayDashboard(data); e.target.reset(); alert('Income added!'); }
+        }
+
+        function displayIncome(list) {
+            const el = document.getElementById('incomeList');
+            if (!list.length) { el.innerHTML = '<p class="no-data">No entries.</p>'; return; }
+            el.innerHTML = '<table class="data-table"><thead><tr><th>Date</th><th>Source</th><th>Category</th><th>Amount</th><th>Freq</th><th>Actions</th></tr></thead><tbody>' +
+                list.sort((a, b) => new Date(b.date) - new Date(a.date)).map(i => `<tr>
+                <td>${formatDate(i.date)}</td><td>${i.source}</td><td>${i.category}</td>
+                <td class="amount-positive">£${i.amount.toFixed(2)}</td><td>${i.frequency}</td>
+                <td><button onclick="editIncome(${i.id})" class="btn-edit">Edit</button><button onclick="deleteIncome(${i.id})" class="btn-delete">Delete</button></td>
+            </tr>`).join('') + '</tbody></table>';
+        }
+
+        function deleteIncome(id) {
+            if (!confirm('Delete?')) return;
+            const data = loadData();
+            data.income = data.income.filter(i => i.id !== id);
+            saveData(data); displayIncome(data.income); displayDashboard(data);
+        }
+
+        function editIncome(id) {
+            const data = loadData();
+            const item = data.income.find(i => i.id === id);
+            if (item) {
+                document.getElementById('incomeDate').value = item.date;
+                document.getElementById('incomeSource').value = item.source;
+                document.getElementById('incomeCategory').value = item.category;
+                document.getElementById('incomeAmount').value = item.amount;
+                document.getElementById('incomeFrequency').value = item.frequency;
+                document.getElementById('incomeTaxStatus').value = item.taxStatus;
+                document.getElementById('incomeNotes').value = item.notes;
+                document.getElementById('editingIncomeId').value = id;
+                document.querySelector('#incomeForm button[type="submit"]').textContent = 'Update Income';
+            }
+        }
+
+        function updateIncome(id) { // Not in spec as separate func called by form? Spec says 'updateIncome(id)' but form calls 'addIncome'. 
+            // I modified addIncome to check for ID.
+            const data = loadData();
+            const idx = data.income.findIndex(i => i.id === id);
+            if (idx !== -1) {
+                data.income[idx] = {
+                    ...data.income[idx],
+                    date: document.getElementById('incomeDate').value,
+                    source: document.getElementById('incomeSource').value,
+                    category: document.getElementById('incomeCategory').value,
+                    amount: parseFloat(document.getElementById('incomeAmount').value),
+                    frequency: document.getElementById('incomeFrequency').value,
+                    taxStatus: document.getElementById('incomeTaxStatus').value,
+                    notes: document.getElementById('incomeNotes').value,
+                    updatedAt: new Date().toISOString()
+                };
+                saveData(data); displayIncome(data.income); displayDashboard(data);
+                document.getElementById('incomeForm').reset();
+                document.getElementById('editingIncomeId').value = '';
+                document.querySelector('#incomeForm button[type="submit"]').textContent = 'Add Income';
+                alert('Updated!');
+            }
+        }
+
+        // EXPENSES
+        function addExpense(e) {
+            e.preventDefault();
+            const data = loadData();
+            const id = document.getElementById('editingExpenseId').value;
+            if (id) { updateExpense(Number(id)); return; }
+
+            const item = {
+                id: generateId(),
+                date: document.getElementById('expenseDate').value,
+                description: document.getElementById('expenseDesc').value,
+                category: document.getElementById('expenseCategory').value,
+                amount: parseFloat(document.getElementById('expenseAmount').value),
+                paymentMethod: document.getElementById('expensePayment').value,
+                recurring: document.getElementById('expenseRecurring').checked,
+                taxDeductible: document.getElementById('expenseTax').checked,
+                notes: document.getElementById('expenseNotes').value,
+                createdAt: new Date().toISOString(), updatedAt: new Date().toISOString()
+            };
+            data.expenses.push(item);
+            if (saveData(data)) { displayExpenses(data.expenses); displayDashboard(data); displayBudget(data); e.target.reset(); alert('Expense added!'); }
+        }
+
+        function displayExpenses(list) {
+            const el = document.getElementById('expenseList');
+            if (!list.length) { el.innerHTML = '<p class="no-data">No entries.</p>'; return; }
+            el.innerHTML = '<table class="data-table"><thead><tr><th>Date</th><th>Desc</th><th>Category</th><th>Amount</th><th>Method</th><th>Actions</th></tr></thead><tbody>' +
+                list.sort((a, b) => new Date(b.date) - new Date(a.date)).map(e => `<tr>
+                <td>${formatDate(e.date)}</td><td>${e.description}</td><td>${e.category}</td>
+                <td class="amount-negative">£${e.amount.toFixed(2)}</td><td>${e.paymentMethod}</td>
+                <td><button onclick="editExpense(${e.id})" class="btn-edit">Edit</button><button onclick="deleteExpense(${e.id})" class="btn-delete">Delete</button></td>
+            </tr>`).join('') + '</tbody></table>';
+        }
+
+        function deleteExpense(id) {
+            if (!confirm('Delete?')) return;
+            const data = loadData();
+            data.expenses = data.expenses.filter(e => e.id !== id);
+            saveData(data); displayExpenses(data.expenses); displayDashboard(data); displayBudget(data);
+        }
+
+        function editExpense(id) {
+            const data = loadData();
+            const item = data.expenses.find(e => e.id === id);
+            if (item) {
+                document.getElementById('expenseDate').value = item.date;
+                document.getElementById('expenseDesc').value = item.description;
+                document.getElementById('expenseCategory').value = item.category;
+                document.getElementById('expenseAmount').value = item.amount;
+                document.getElementById('expensePayment').value = item.paymentMethod;
+                document.getElementById('expenseRecurring').checked = item.recurring;
+                document.getElementById('expenseTax').checked = item.taxDeductible;
+                document.getElementById('expenseNotes').value = item.notes;
+                document.getElementById('editingExpenseId').value = id;
+                document.querySelector('#expenseForm button[type="submit"]').textContent = 'Update Expense';
+                document.getElementById('expenseForm').scrollIntoView({ behavior: 'smooth' });
+            }
+        }
+
+        function updateExpense(id) {
+            const data = loadData();
+            const idx = data.expenses.findIndex(e => e.id === id);
+            if (idx !== -1) {
+                data.expenses[idx] = {
+                    ...data.expenses[idx],
+                    date: document.getElementById('expenseDate').value,
+                    description: document.getElementById('expenseDesc').value,
+                    category: document.getElementById('expenseCategory').value,
+                    amount: parseFloat(document.getElementById('expenseAmount').value),
+                    paymentMethod: document.getElementById('expensePayment').value,
+                    recurring: document.getElementById('expenseRecurring').checked,
+                    taxDeductible: document.getElementById('expenseTax').checked,
+                    notes: document.getElementById('expenseNotes').value,
+                    updatedAt: new Date().toISOString()
+                };
+                saveData(data); displayExpenses(data.expenses); displayDashboard(data); displayBudget(data);
+                document.getElementById('expenseForm').reset();
+                document.getElementById('editingExpenseId').value = '';
+                document.querySelector('#expenseForm button[type="submit"]').textContent = 'Add Expense';
+                alert('Updated!');
+            }
+        }
+
+        // BUDGET
+        function setBudget(e) {
+            e.preventDefault();
+            const data = loadData();
+            const cat = document.getElementById('budgetCategory').value;
+            const amt = parseFloat(document.getElementById('budgetAmount').value);
+            data.budget[cat] = amt;
+            if (saveData(data)) { displayBudget(data); e.target.reset(); alert('Budget set!'); }
+        }
+
+        function displayBudget(data) {
+            const el = document.getElementById('budgetList');
+            const placeholder = document.getElementById('budgetPlaceholder'); // Handle placeholder removal if logic differs
+            // My HTML replacement will remove placeholder, so element ID needs to be correct.
+            // Wait, I am replacing placeholder with content that INCLUDES #budgetList.
+            // So this function assumes HTML is there.
+            if (!el) return;
+
+            const now = new Date();
+            const monthExpenses = data.expenses.filter(e => new Date(e.date).getMonth() === now.getMonth() && new Date(e.date).getFullYear() === now.getFullYear());
+
+            const cats = Object.keys(data.budget);
+            // Also include categories with expenses even if no budget set? Spec is vague. 
+            // Better to show all categories that have either budget OR expenses.
+            const expCats = [...new Set(monthExpenses.map(e => e.category))];
+            const allCats = [...new Set([...cats, ...expCats])].sort();
+
+            if (!allCats.length) { el.innerHTML = '<p class="no-data">No budget or expenses yet.</p>'; return; }
+
+            let html = '<table class="data-table"><thead><tr><th>Category</th><th>Budget</th><th>Actual</th><th>Remaining</th><th>Status</th></tr></thead><tbody>';
+
+            allCats.forEach(cat => {
+                const bud = data.budget[cat] || 0;
+                const act = monthExpenses.filter(e => e.category === cat).reduce((s, e) => s + e.amount, 0);
+                const rem = bud - act;
+                const pct = bud ? (act / bud) * 100 : (act ? 100 : 0); // 100% if no budget but spend
+                const color = rem >= 0 ? 'green' : 'red';
+                const status = bud ? `${pct.toFixed(0)}%` : 'No Limit';
+
+                html += `<tr>
+                    <td>${cat}</td>
+                    <td>£${bud.toFixed(2)}</td>
+                    <td>£${act.toFixed(2)}</td>
+                    <td style="color:${color};font-weight:bold">£${rem.toFixed(2)}</td>
+                    <td><div style="background:#eee;height:10px;width:100px;border-radius:5px;overflow:hidden"><div style="background:${color};width:${Math.min(pct, 100)}%;height:100%"></div></div> ${status}</td>
+                </tr>`;
+            });
+            html += '</tbody></table>';
+            el.innerHTML = html;
+        }
+
+        // ASSETS
+        function addAsset(e) {
+            e.preventDefault();
+            const data = loadData();
+            const id = document.getElementById('editingAssetId').value;
+            if (id) {
+                const idx = data.assets.findIndex(a => a.id == id);
+                if (idx !== -1) {
+                    data.assets[idx] = {
+                        ...data.assets[idx],
+                        assetName: document.getElementById('assetName').value,
+                        assetType: document.getElementById('assetType').value,
+                        currentValue: parseFloat(document.getElementById('assetValue').value),
+                        liquidity: document.getElementById('assetLiquidity').value,
+                        lastUpdated: new Date().toISOString()
+                    };
+                    saveData(data); displayAssets(data.assets); displayDashboard(data);
+                    e.target.reset(); document.getElementById('editingAssetId').value = '';
+                    document.querySelector('#assetForm button').textContent = 'Save Asset';
+                    return;
+                }
+            }
+            const item = {
+                id: generateId(),
+                assetName: document.getElementById('assetName').value,
+                assetType: document.getElementById('assetType').value,
+                currentValue: parseFloat(document.getElementById('assetValue').value),
+                liquidity: document.getElementById('assetLiquidity').value,
+                lastUpdated: new Date().toISOString()
+            };
+            data.assets.push(item);
+            if (saveData(data)) { displayAssets(data.assets); displayDashboard(data); e.target.reset(); }
+        }
+        function displayAssets(list) {
+            const el = document.getElementById('assetList');
+            if (!list.length) { el.innerHTML = '<p class="no-data">No assets.</p>'; return; }
+            el.innerHTML = '<table class="data-table"><thead><tr><th>Name</th><th>Type</th><th>Value</th><th>Liquidity</th><th>Actions</th></tr></thead><tbody>' +
+                list.map(a => `<tr><td>${a.assetName}</td><td>${a.assetType}</td><td class="amount-positive">£${a.currentValue.toFixed(2)}</td><td>${a.liquidity}</td>
+            <td><button onclick="editAsset(${a.id})" class="btn-edit">Edit</button><button onclick="deleteAsset(${a.id})" class="btn-delete">Delete</button></td></tr>`).join('') + '</tbody></table>';
+        }
+        function editAsset(id) {
+            const data = loadData();
+            const item = data.assets.find(a => a.id == id);
+            if (item) {
+                document.getElementById('assetName').value = item.assetName;
+                document.getElementById('assetType').value = item.assetType;
+                document.getElementById('assetValue').value = item.currentValue;
+                document.getElementById('assetLiquidity').value = item.liquidity;
+                document.getElementById('editingAssetId').value = id;
+                document.querySelector('#assetForm button').textContent = 'Update Asset';
+            }
+        }
+        function deleteAsset(id) {
+            if (!confirm('Delete?')) return;
+            const data = loadData();
+            data.assets = data.assets.filter(a => a.id !== id);
+            saveData(data); displayAssets(data.assets); displayDashboard(data);
+        }
+
+        // LIABILITIES
+        function addLiability(e) {
+            e.preventDefault();
+            const data = loadData();
+            const id = document.getElementById('editingLiabilityId').value;
+            if (id) {
+                const idx = data.liabilities.findIndex(a => a.id == id);
+                if (idx !== -1) {
+                    data.liabilities[idx] = {
+                        ...data.liabilities[idx],
+                        creditor: document.getElementById('liabCreditor').value,
+                        debtType: document.getElementById('liabType').value,
+                        currentBalance: parseFloat(document.getElementById('liabBalance').value),
+                        interestRate: document.getElementById('liabRate').value,
+                        minimumPayment: document.getElementById('liabMin').value,
+                        startDate: document.getElementById('liabDate').value,
+                        lastUpdated: new Date().toISOString()
+                    };
+                    saveData(data); displayLiabilities(data.liabilities); displayDashboard(data);
+                    e.target.reset(); document.getElementById('editingLiabilityId').value = '';
+                    document.querySelector('#liabilityForm button').textContent = 'Save Liability';
+                    return;
+                }
+            }
+            const item = {
+                id: generateId(),
+                creditor: document.getElementById('liabCreditor').value,
+                debtType: document.getElementById('liabType').value,
+                currentBalance: parseFloat(document.getElementById('liabBalance').value),
+                interestRate: document.getElementById('liabRate').value,
+                minimumPayment: document.getElementById('liabMin').value,
+                startDate: document.getElementById('liabDate').value,
+                lastUpdated: new Date().toISOString()
+            };
+            data.liabilities.push(item);
+            if (saveData(data)) { displayLiabilities(data.liabilities); displayDashboard(data); e.target.reset(); }
+        }
+        function displayLiabilities(list) {
+            const el = document.getElementById('liabilityList');
+            if (!list.length) { el.innerHTML = '<p class="no-data">No liabilities.</p>'; return; }
+            el.innerHTML = '<table class="data-table"><thead><tr><th>Creditor</th><th>Type</th><th>Balance</th><th>Rate</th><th>Min Pay</th><th>Actions</th></tr></thead><tbody>' +
+                list.map(l => `<tr><td>${l.creditor}</td><td>${l.debtType}</td><td class="amount-negative">£${l.currentBalance.toFixed(2)}</td><td>${l.interestRate}%</td><td>£${l.minimumPayment || 0}</td>
+            <td><button onclick="editLiability(${l.id})" class="btn-edit">Edit</button><button onclick="deleteLiability(${l.id})" class="btn-delete">Delete</button></td></tr>`).join('') + '</tbody></table>';
+        }
+        function editLiability(id) {
+            const data = loadData();
+            const item = data.liabilities.find(l => l.id == id);
+            if (item) {
+                document.getElementById('liabCreditor').value = item.creditor;
+                document.getElementById('liabType').value = item.debtType;
+                document.getElementById('liabBalance').value = item.currentBalance;
+                document.getElementById('liabRate').value = item.interestRate;
+                document.getElementById('liabMin').value = item.minimumPayment;
+                document.getElementById('liabDate').value = item.startDate;
+                document.getElementById('editingLiabilityId').value = id;
+                document.querySelector('#liabilityForm button').textContent = 'Update Liability';
+            }
+        }
+        function deleteLiability(id) {
+            if (!confirm('Delete?')) return;
+            const data = loadData();
+            data.liabilities = data.liabilities.filter(l => l.id !== id);
+            saveData(data); displayLiabilities(data.liabilities); displayDashboard(data);
+        }
+
+        // INVESTMENTS
+        function addInvestment(e) {
+            e.preventDefault();
+            const data = loadData();
+            const id = document.getElementById('editingInvestId').value;
+            if (id) {
+                const idx = data.investments.findIndex(a => a.id == id);
+                if (idx !== -1) {
+                    data.investments[idx] = {
+                        ...data.investments[idx],
+                        assetName: document.getElementById('invName').value,
+                        ticker: document.getElementById('invTicker').value,
+                        investmentType: document.getElementById('invType').value,
+                        quantity: parseFloat(document.getElementById('invQty').value),
+                        costBasisPerUnit: parseFloat(document.getElementById('invCost').value) || 0,
+                        currentPrice: parseFloat(document.getElementById('invPrice').value),
+                        lastUpdated: new Date().toISOString()
+                    };
+                    saveData(data); displayInvestments(data.investments); displayDashboard(data);
+                    e.target.reset(); document.getElementById('editingInvestId').value = '';
+                    document.querySelector('#investForm button').textContent = 'Save Investment';
+                    return;
+                }
+            }
+            const item = {
+                id: generateId(),
+                assetName: document.getElementById('invName').value,
+                ticker: document.getElementById('invTicker').value,
+                investmentType: document.getElementById('invType').value,
+                quantity: parseFloat(document.getElementById('invQty').value),
+                costBasisPerUnit: parseFloat(document.getElementById('invCost').value) || 0,
+                currentPrice: parseFloat(document.getElementById('invPrice').value),
+                lastUpdated: new Date().toISOString()
+            };
+            data.investments.push(item);
+            if (saveData(data)) { displayInvestments(data.investments); displayDashboard(data); e.target.reset(); }
+        }
+        function displayInvestments(list) {
+            const el = document.getElementById('investList');
+            if (!list.length) { el.innerHTML = '<p class="no-data">No investments.</p>'; return; }
+            el.innerHTML = '<table class="data-table"><thead><tr><th>Name</th><th>Ticker</th><th>Qty</th><th>Price</th><th>Value</th><th>Actions</th></tr></thead><tbody>' +
+                list.map(i => {
+                    const val = i.quantity * i.currentPrice;
+                    return `<tr><td>${i.assetName}</td><td>${i.ticker || '-'}</td><td>${i.quantity}</td><td>£${i.currentPrice}</td><td class="amount-positive">£${val.toFixed(2)}</td>
+            <td><button onclick="editInvest(${i.id})" class="btn-edit">Edit</button><button onclick="deleteInvest(${i.id})" class="btn-delete">Delete</button></td></tr>`;
+                }).join('') + '</tbody></table>';
+        }
+        function editInvest(id) {
+            const data = loadData();
+            const item = data.investments.find(i => i.id == id);
+            if (item) {
+                document.getElementById('invName').value = item.assetName;
+                document.getElementById('invTicker').value = item.ticker;
+                document.getElementById('invType').value = item.investmentType;
+                document.getElementById('invQty').value = item.quantity;
+                document.getElementById('invCost').value = item.costBasisPerUnit;
+                document.getElementById('invPrice').value = item.currentPrice;
+                document.getElementById('editingInvestId').value = id;
+                document.querySelector('#investForm button').textContent = 'Update Investment';
+            }
+        }
+        function deleteInvest(id) {
+            if (!confirm('Delete?')) return;
+            const data = loadData();
+            data.investments = data.investments.filter(i => i.id !== id);
+            saveData(data); displayInvestments(data.investments); displayDashboard(data);
+        }
+
+        // GOALS
+        function addGoal(e) {
+            e.preventDefault();
+            const data = loadData();
+            const id = document.getElementById('editingGoalId').value;
+            if (id) {
+                const idx = data.goals.findIndex(g => g.id == id);
+                if (idx !== -1) {
+                    data.goals[idx] = {
+                        ...data.goals[idx],
+                        goalName: document.getElementById('goalName').value,
+                        goalType: document.getElementById('goalType').value,
+                        targetAmount: parseFloat(document.getElementById('goalTarget').value),
+                        currentAmount: parseFloat(document.getElementById('goalCurrent').value),
+                        targetDate: document.getElementById('goalDate').value,
+                        monthlyContribution: parseFloat(document.getElementById('goalContrib').value) || 0,
+                        lastUpdated: new Date().toISOString()
+                    };
+                    saveData(data); displayGoals(data.goals);
+                    e.target.reset(); document.getElementById('editingGoalId').value = '';
+                    document.querySelector('#goalForm button').textContent = 'Save Goal';
+                    return;
+                }
+            }
+            const item = {
+                id: generateId(),
+                goalName: document.getElementById('goalName').value,
+                goalType: document.getElementById('goalType').value,
+                targetAmount: parseFloat(document.getElementById('goalTarget').value),
+                currentAmount: parseFloat(document.getElementById('goalCurrent').value),
+                targetDate: document.getElementById('goalDate').value,
+                monthlyContribution: parseFloat(document.getElementById('goalContrib').value) || 0,
+                lastUpdated: new Date().toISOString()
+            };
+            data.goals.push(item);
+            if (saveData(data)) { displayGoals(data.goals); e.target.reset(); }
+        }
+        function displayGoals(list) {
+            const el = document.getElementById('goalList');
+            if (!list.length) { el.innerHTML = '<p class="no-data">No goals.</p>'; return; }
+            el.innerHTML = '<table class="data-table"><thead><tr><th>Name</th><th>Progress</th><th>Target</th><th>Deadline</th><th>Actions</th></tr></thead><tbody>' +
+                list.map(g => {
+                    const pct = (g.currentAmount / g.targetAmount) * 100;
+                    return `<tr><td>${g.goalName}</td>
+                <td><div style="background:#eee;height:10px;width:100px;border-radius:5px;overflow:hidden"><div style="background:var(--success);width:${Math.min(pct, 100)}%;height:100%"></div></div> ${pct.toFixed(0)}%</td>
+                <td>£${g.targetAmount}</td><td>${g.targetDate ? formatDate(g.targetDate) : '-'}</td>
+                <td><button onclick="editGoal(${g.id})" class="btn-edit">Edit</button><button onclick="deleteGoal(${g.id})" class="btn-delete">Delete</button></td></tr>`;
+                }).join('') + '</tbody></table>';
+        }
+        function editGoal(id) {
+            const data = loadData();
+            const item = data.goals.find(g => g.id == id);
+            if (item) {
+                document.getElementById('goalName').value = item.goalName;
+                document.getElementById('goalType').value = item.goalType;
+                document.getElementById('goalTarget').value = item.targetAmount;
+                document.getElementById('goalCurrent').value = item.currentAmount;
+                document.getElementById('goalDate').value = item.targetDate;
+                document.getElementById('goalContrib').value = item.monthlyContribution;
+                document.getElementById('editingGoalId').value = id;
+                document.querySelector('#goalForm button').textContent = 'Update Goal';
+            }
+        }
+        function deleteGoal(id) {
+            if (!confirm('Delete?')) return;
+            const data = loadData();
+            data.goals = data.goals.filter(g => g.id !== id);
+            saveData(data); displayGoals(data.goals);
+        }
+
+        // DASHBOARD
+        function displayDashboard(data) {
+            const now = new Date();
+            const inc = data.income.filter(i => new Date(i.date).getMonth() === now.getMonth() && new Date(i.date).getFullYear() === now.getFullYear());
+            const exp = data.expenses.filter(e => new Date(e.date).getMonth() === now.getMonth() && new Date(e.date).getFullYear() === now.getFullYear());
+
+            const totalInc = inc.reduce((s, i) => s + i.amount, 0);
+            const totalExp = exp.reduce((s, e) => s + e.amount, 0);
+            const net = totalInc - totalExp;
+
+            document.getElementById('dashTotalIncome').textContent = '£' + totalInc.toFixed(2);
+            document.getElementById('dashTotalExpenses').textContent = '£' + totalExp.toFixed(2);
+            document.getElementById('dashNetSavings').textContent = '£' + net.toFixed(2);
+            document.getElementById('dashSavingsRate').textContent = (totalInc ? (net / totalInc * 100).toFixed(1) : '0') + '%';
+
+            const assets = data.assets.reduce((s, a) => s + a.currentValue, 0);
+            const liabs = data.liabilities.reduce((s, l) => s + l.currentBalance, 0);
+            document.getElementById('dashTotalAssets').textContent = '£' + assets.toFixed(2);
+            document.getElementById('dashTotalLiabilities').textContent = '£' + liabs.toFixed(2);
+            document.getElementById('dashNetWorth').textContent = '£' + (assets - liabs).toFixed(2);
+        }
+
+        // DATA OPS
+        function exportDataJSON() {
+            const blob = new Blob([JSON.stringify(loadData(), null, 2)], { type: 'application/json' });
+            const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'finance_data.json'; a.click();
+        }
+        function exportExpensesCSV() {
+            const data = loadData();
+            let csv = 'Date,Desc,Cat,Amt\n' + data.expenses.map(e => `${e.date},"${e.description}","${e.category}",${e.amount}`).join('\n');
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'expenses.csv'; a.click();
+        }
+        function importDataJSON(e) {
+            const r = new FileReader();
+            r.onload = ev => {
+                if (confirm('Replace all data?')) { saveData(JSON.parse(ev.target.result)); location.reload(); }
+            };
+            r.readAsText(e.target.files[0]);
+        }
+        function clearAllData() {
+            if (confirm('Clear all data?')) { localStorage.removeItem('personalFinanceData'); location.reload(); }
+        }
+        function autoBackup() { /* ... */ }
+        function updateDataInfo(data) {
+            document.getElementById('totalEntriesDisplay').textContent = data.income.length + data.expenses.length + data.assets.length + data.liabilities.length + data.goals.length;
+            document.getElementById('lastUpdatedDisplay').textContent = new Date(data.metadata.lastUpdated).toLocaleString();
+        }
+    </script>
+</body>
+
+</html>
