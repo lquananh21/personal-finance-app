@@ -1346,9 +1346,9 @@
     function addIncome(e) {
       e.preventDefault(); const f = e.target; if (!validate(f)) return;
       DATA.incomes.push({ id: ++nextId, source: f.incSource.value, category: f.incCategory.value, amount: Number(f.incAmount.value), frequency: f.incFrequency.value, startDate: f.incStart.value, endDate: f.incEnd.value });
-      f.reset(); f.incStart.value = new Date().toISOString().split('T')[0]; toast('Income source added'); render();
+      f.reset(); f.incStart.value = new Date().toISOString().split('T')[0]; toast('Income source added'); saveData(); render();
     }
-    function deleteIncome(id) { DATA.incomes = DATA.incomes.filter(i => i.id !== id); toast('Income removed', 'warning'); render() }
+    function deleteIncome(id) { DATA.incomes = DATA.incomes.filter(i => i.id !== id); toast('Income removed', 'warning'); saveData(); render() }
 
     // ═══════════════════════════════════════
     // EXPENSES
@@ -1401,9 +1401,9 @@
     function addExpense(e) {
       e.preventDefault(); const f = e.target; if (!validate(f)) return;
       DATA.expenses.push({ id: ++nextId, description: f.expDesc.value, category: f.expCategory.value, amount: Number(f.expAmount.value), date: f.expDate.value, recurring: f.expRecurring.checked, paymentMethod: f.expMethod.value });
-      f.reset(); f.expDate.value = new Date().toISOString().split('T')[0]; toast('Expense added'); renderExpTable();
+      f.reset(); f.expDate.value = new Date().toISOString().split('T')[0]; toast('Expense added'); saveData(); renderExpTable();
     }
-    function deleteExpense(id) { DATA.expenses = DATA.expenses.filter(e => e.id !== id); toast('Expense removed', 'warning'); renderExpTable() }
+    function deleteExpense(id) { DATA.expenses = DATA.expenses.filter(e => e.id !== id); toast('Expense removed', 'warning'); saveData(); renderExpTable() }
 
     // ═══════════════════════════════════════
     // BUDGETS
@@ -1451,9 +1451,9 @@
       e.preventDefault(); const cat = document.getElementById('budCat').value, amt = Number(document.getElementById('budAmount').value);
       const existing = DATA.budgets.find(b => b.category === cat);
       if (existing) { existing.allocated = amt } else { DATA.budgets.push({ category: cat, allocated: amt }) }
-      toast('Budget updated'); render();
+      toast('Budget updated'); saveData(); render();
     }
-    function deleteBudget(cat) { DATA.budgets = DATA.budgets.filter(b => b.category !== cat); toast('Budget removed', 'warning'); render() }
+    function deleteBudget(cat) { DATA.budgets = DATA.budgets.filter(b => b.category !== cat); toast('Budget removed', 'warning'); saveData(); render() }
 
     // ═══════════════════════════════════════
     // INVESTMENTS
@@ -1509,9 +1509,9 @@
     function addInvestment(e) {
       e.preventDefault(); const f = e.target; if (!validate(f)) return;
       DATA.investments.push({ id: ++nextId, name: f.invName.value, category: f.invCat.value, costBasis: Number(f.invCost.value), currentValue: Number(f.invVal.value), date: f.invDate.value });
-      f.reset(); toast('Investment added'); renderInvTable();
+      f.reset(); f.invDate.value = new Date().toISOString().split('T')[0]; toast('Investment added'); saveData(); render();
     }
-    function deleteInvestment(id) { DATA.investments = DATA.investments.filter(i => i.id !== id); toast('Investment removed', 'warning'); render() }
+    function deleteInvestment(id) { DATA.investments = DATA.investments.filter(i => i.id !== id); toast('Investment removed', 'warning'); saveData(); render() }
 
     // ═══════════════════════════════════════
     // DEBTS
@@ -1560,9 +1560,9 @@
     function addDebt(e) {
       e.preventDefault(); const f = e.target; if (!validate(f)) return;
       DATA.debts.push({ id: ++nextId, name: f.debtName.value, type: f.debtType.value, balance: Number(f.debtBal.value), interestRate: Number(f.debtRate.value), minPayment: Number(f.debtMin.value), startDate: f.debtDate.value });
-      f.reset(); toast('Debt added'); render();
+      f.reset(); toast('Debt added'); saveData(); render();
     }
-    function deleteDebt(id) { DATA.debts = DATA.debts.filter(d => d.id !== id); toast('Debt removed', 'warning'); render() }
+    function deleteDebt(id) { DATA.debts = DATA.debts.filter(d => d.id !== id); toast('Debt removed', 'warning'); saveData(); render() }
 
     // ═══════════════════════════════════════
     // GOALS
@@ -1603,9 +1603,9 @@
     function addGoal(e) {
       e.preventDefault(); const f = e.target; if (!validate(f)) return;
       DATA.goals.push({ id: ++nextId, name: f.goalName.value, category: f.goalCat.value, targetAmount: Number(f.goalTarget.value), currentAmount: Number(f.goalCurrent.value), deadline: f.goalDeadline.value });
-      f.reset(); toast('Goal added'); render();
+      f.reset(); toast('Goal added'); saveData(); render();
     }
-    function deleteGoal(id) { DATA.goals = DATA.goals.filter(g => g.id !== id); toast('Goal removed', 'warning'); render() }
+    function deleteGoal(id) { DATA.goals = DATA.goals.filter(g => g.id !== id); toast('Goal removed', 'warning'); saveData(); render() }
 
     // ═══════════════════════════════════════
     // REPORTS
@@ -1658,18 +1658,46 @@
       });
     }
     function exportCSV() {
-      let csv = 'Category,Type,Description,Amount,Date\n';
-      DATA.incomes.forEach(i => { csv += `"${INCOME_CATS[i.category] || i.category}","Income","${i.source}",${i.amount},"${i.date}"\n` });
-      DATA.expenses.forEach(e => { csv += `"${CATS[e.category] || e.category}","Expense","${e.description}",${e.amount},"${e.date}"\n` });
+      let csv = 'Type,Name,Category,Amount,Date,Extra\n';
+      DATA.incomes.forEach(i => { csv += `"Income","${i.source}","${INCOME_CATS[i.category] || i.category}",${i.amount},"${i.startDate}",${i.frequency}\n` });
+      DATA.expenses.forEach(e => { csv += `"Expense","${e.description}","${CATS[e.category] || e.category}",${e.amount},"${e.date}",${e.paymentMethod}\n` });
+      DATA.investments.forEach(i => { csv += `"Investment","${i.name}","${INVEST_CATS[i.category] || i.category}",${i.currentValue},"${i.date}","Cost: ${i.costBasis}"\n` });
+      DATA.debts.forEach(d => { csv += `"Debt","${d.name}","${d.type}",${d.balance},"${d.startDate}","Rate: ${d.interestRate}%"\n` });
+      DATA.goals.forEach(g => { csv += `"Goal","${g.name}","${g.category}",${g.currentAmount},"${g.deadline}","Target: ${g.targetAmount}"\n` });
+
       const blob = new Blob([csv], { type: 'text/csv' }); const a = document.createElement('a');
-      a.href = URL.createObjectURL(blob); a.download = 'finance_report.csv'; a.click();
-      toast('CSV exported');
+      a.href = URL.createObjectURL(blob); a.download = `finance_export_${new Date().toISOString().slice(0, 10)}.csv`; a.click();
+      toast('Data exported to Excel (CSV)');
     }
+
+    // ═══════════════════════════════════════
+    // INIT & PERSISTENCE
+    // ═══════════════════════════════════════
+    function saveData() { localStorage.setItem('financeFlowData', JSON.stringify(DATA)); }
+    function loadData() {
+      const saved = localStorage.getItem('financeFlowData');
+      if (saved) {
+        try {
+          const parsed = JSON.parse(saved);
+          Object.keys(DATA).forEach(k => { if (parsed[k]) DATA[k] = parsed[k] });
+          const ids = [
+            ...(DATA.incomes || []).map(i => i.id),
+            ...(DATA.expenses || []).map(e => e.id),
+            ...(DATA.investments || []).map(i => i.id),
+            ...(DATA.debts || []).map(d => d.id),
+            ...(DATA.goals || []).map(g => g.id)
+          ];
+          if (ids.length) nextId = Math.max(...ids) + 1;
+        } catch (e) { console.error('Failed to load data', e) }
+      }
+    }
+
 
     // ═══════════════════════════════════════
     // INIT
     // ═══════════════════════════════════════
     document.getElementById('currentDate').textContent = new Date().toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+    loadData();
     initNav();
     render();
 
