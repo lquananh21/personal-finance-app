@@ -1,0 +1,1647 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FinanceFlow — Personal Finance Manager</title>
+  <meta name="description"
+    content="Professional personal finance management application with budgeting, investment tracking, and financial goal planning.">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+    rel="stylesheet">
+  <style>
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0
+    }
+
+    :root {
+      --bg: #f8f9fb;
+      --surface: #fff;
+      --surface-alt: #f3f4f6;
+      --border: #e5e7eb;
+      --text: #1a1a2e;
+      --text-secondary: #6b7280;
+      --text-muted: #9ca3af;
+      --primary: #2563eb;
+      --primary-light: #dbeafe;
+      --primary-dark: #1d4ed8;
+      --accent: #7c3aed;
+      --accent-light: #ede9fe;
+      --success: #059669;
+      --success-light: #d1fae5;
+      --success-bg: #ecfdf5;
+      --warning: #d97706;
+      --warning-light: #fef3c7;
+      --warning-bg: #fffbeb;
+      --danger: #dc2626;
+      --danger-light: #fee2e2;
+      --danger-bg: #fef2f2;
+      --sidebar: #0f172a;
+      --sidebar-text: #94a3b8;
+      --sidebar-active: #e2e8f0;
+      --shadow-sm: 0 1px 2px rgba(0, 0, 0, .05);
+      --shadow: 0 1px 3px rgba(0, 0, 0, .1), 0 1px 2px rgba(0, 0, 0, .06);
+      --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, .1), 0 2px 4px -2px rgba(0, 0, 0, .1);
+      --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, .1), 0 4px 6px -4px rgba(0, 0, 0, .1);
+      --radius: 8px;
+      --radius-lg: 12px;
+      --radius-xl: 16px;
+      --font: 'Inter', system-ui, -apple-system, sans-serif;
+    }
+
+    html {
+      font-size: 14px
+    }
+
+    body {
+      font-family: var(--font);
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      min-height: 100vh;
+      display: flex
+    }
+
+    a {
+      color: var(--primary);
+      text-decoration: none
+    }
+
+    button {
+      font-family: var(--font);
+      cursor: pointer;
+      border: none;
+      outline: none
+    }
+
+    input,
+    select,
+    textarea {
+      font-family: var(--font);
+      font-size: .9rem;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: .55rem .75rem;
+      width: 100%;
+      background: var(--surface);
+      color: var(--text);
+      transition: border .2s
+    }
+
+    input:focus,
+    select:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px var(--primary-light)
+    }
+
+    label {
+      font-weight: 500;
+      font-size: .82rem;
+      color: var(--text-secondary);
+      margin-bottom: .25rem;
+      display: block
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse
+    }
+
+    th {
+      text-align: left;
+      font-weight: 600;
+      font-size: .78rem;
+      text-transform: uppercase;
+      letter-spacing: .05em;
+      color: var(--text-secondary);
+      padding: .65rem .75rem;
+      border-bottom: 2px solid var(--border);
+      background: var(--surface-alt)
+    }
+
+    td {
+      padding: .6rem .75rem;
+      border-bottom: 1px solid var(--border);
+      font-size: .88rem
+    }
+
+    tr:hover td {
+      background: var(--surface-alt)
+    }
+
+    h1 {
+      font-size: 1.65rem;
+      font-weight: 700;
+      letter-spacing: -.02em
+    }
+
+    h2 {
+      font-size: 1.25rem;
+      font-weight: 600;
+      letter-spacing: -.01em
+    }
+
+    h3 {
+      font-size: 1.05rem;
+      font-weight: 600
+    }
+
+    /* Sidebar */
+    .sidebar {
+      width: 250px;
+      background: var(--sidebar);
+      color: var(--sidebar-text);
+      display: flex;
+      flex-direction: column;
+      position: fixed;
+      top: 0;
+      left: 0;
+      bottom: 0;
+      z-index: 100;
+      transition: transform .3s
+    }
+
+    .sidebar-logo {
+      padding: 1.25rem 1.5rem;
+      border-bottom: 1px solid rgba(255, 255, 255, .08);
+      display: flex;
+      align-items: center;
+      gap: .65rem
+    }
+
+    .sidebar-logo svg {
+      width: 28px;
+      height: 28px
+    }
+
+    .sidebar-logo h1 {
+      font-size: 1.1rem;
+      color: #fff;
+      font-weight: 700;
+      letter-spacing: -.02em
+    }
+
+    .sidebar-logo span {
+      font-size: .7rem;
+      background: var(--primary);
+      color: #fff;
+      padding: .1rem .45rem;
+      border-radius: 99px;
+      font-weight: 600;
+      margin-left: .25rem
+    }
+
+    .sidebar nav {
+      flex: 1;
+      padding: .75rem 0;
+      overflow-y: auto
+    }
+
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: .75rem;
+      padding: .7rem 1.5rem;
+      color: var(--sidebar-text);
+      font-size: .88rem;
+      font-weight: 500;
+      transition: all .15s;
+      cursor: pointer;
+      border-left: 3px solid transparent
+    }
+
+    .nav-item:hover {
+      background: rgba(255, 255, 255, .06);
+      color: #e2e8f0
+    }
+
+    .nav-item.active {
+      color: var(--sidebar-active);
+      background: rgba(255, 255, 255, .08);
+      border-left-color: var(--primary)
+    }
+
+    .nav-item svg {
+      width: 18px;
+      height: 18px;
+      opacity: .7;
+      flex-shrink: 0
+    }
+
+    .nav-item.active svg {
+      opacity: 1
+    }
+
+    .sidebar-footer {
+      padding: 1rem 1.5rem;
+      border-top: 1px solid rgba(255, 255, 255, .08);
+      font-size: .75rem;
+      color: var(--text-muted)
+    }
+
+    /* Main */
+    .main {
+      flex: 1;
+      margin-left: 250px;
+      min-height: 100vh
+    }
+
+    .topbar {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: .85rem 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      backdrop-filter: blur(8px)
+    }
+
+    .topbar h2 {
+      font-size: 1.15rem
+    }
+
+    .topbar-actions {
+      display: flex;
+      gap: .5rem;
+      align-items: center
+    }
+
+    .hamburger {
+      display: none;
+      background: none;
+      border: none;
+      padding: .5rem;
+      cursor: pointer
+    }
+
+    .hamburger svg {
+      width: 24px;
+      height: 24px;
+      color: var(--text)
+    }
+
+    .content {
+      padding: 1.5rem 2rem;
+      max-width: 1400px
+    }
+
+    /* Cards */
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 1.25rem;
+      box-shadow: var(--shadow-sm);
+      transition: box-shadow .2s
+    }
+
+    .card:hover {
+      box-shadow: var(--shadow)
+    }
+
+    .card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 1rem
+    }
+
+    .card-title {
+      font-size: .95rem;
+      font-weight: 600
+    }
+
+    /* Metric Cards */
+    .metrics-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 1rem;
+      margin-bottom: 1.5rem
+    }
+
+    .metric-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 1.15rem;
+      position: relative;
+      overflow: hidden
+    }
+
+    .metric-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px
+    }
+
+    .metric-card.blue::before {
+      background: linear-gradient(90deg, #2563eb, #7c3aed)
+    }
+
+    .metric-card.green::before {
+      background: linear-gradient(90deg, #059669, #10b981)
+    }
+
+    .metric-card.purple::before {
+      background: linear-gradient(90deg, #7c3aed, #a855f7)
+    }
+
+    .metric-card.orange::before {
+      background: linear-gradient(90deg, #d97706, #f59e0b)
+    }
+
+    .metric-card.red::before {
+      background: linear-gradient(90deg, #dc2626, #ef4444)
+    }
+
+    .metric-label {
+      font-size: .78rem;
+      color: var(--text-secondary);
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: .04em
+    }
+
+    .metric-value {
+      font-size: 1.55rem;
+      font-weight: 700;
+      margin: .25rem 0;
+      letter-spacing: -.02em
+    }
+
+    .metric-sub {
+      font-size: .78rem;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      gap: .3rem
+    }
+
+    .metric-sub.positive {
+      color: var(--success)
+    }
+
+    .metric-sub.negative {
+      color: var(--danger)
+    }
+
+    /* Charts */
+    .charts-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+      margin-bottom: 1.5rem
+    }
+
+    .chart-container {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 1.25rem
+    }
+
+    .chart-container canvas {
+      width: 100% !important;
+      height: 280px !important
+    }
+
+    /* Forms */
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+      margin-bottom: 1rem
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column
+    }
+
+    .form-group.full {
+      grid-column: 1/-1
+    }
+
+    .form-actions {
+      display: flex;
+      gap: .5rem;
+      justify-content: flex-end;
+      padding-top: .75rem
+    }
+
+    .form-error {
+      color: var(--danger);
+      font-size: .75rem;
+      margin-top: .2rem;
+      display: none
+    }
+
+    .form-group.error input,
+    .form-group.error select {
+      border-color: var(--danger)
+    }
+
+    .form-group.error .form-error {
+      display: block
+    }
+
+    .form-section {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 1.5rem;
+      margin-bottom: 1.5rem
+    }
+
+    .form-section h3 {
+      margin-bottom: 1rem;
+      padding-bottom: .65rem;
+      border-bottom: 1px solid var(--border)
+    }
+
+    /* Buttons */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: .4rem;
+      padding: .55rem 1.1rem;
+      border-radius: var(--radius);
+      font-size: .85rem;
+      font-weight: 600;
+      transition: all .15s
+    }
+
+    .btn-primary {
+      background: var(--primary);
+      color: #fff
+    }
+
+    .btn-primary:hover {
+      background: var(--primary-dark);
+      box-shadow: var(--shadow-md)
+    }
+
+    .btn-secondary {
+      background: var(--surface);
+      color: var(--text);
+      border: 1px solid var(--border)
+    }
+
+    .btn-secondary:hover {
+      background: var(--surface-alt)
+    }
+
+    .btn-success {
+      background: var(--success);
+      color: #fff
+    }
+
+    .btn-success:hover {
+      background: #047857
+    }
+
+    .btn-danger {
+      background: var(--danger);
+      color: #fff
+    }
+
+    .btn-danger:hover {
+      background: #b91c1c
+    }
+
+    .btn-sm {
+      padding: .35rem .75rem;
+      font-size: .8rem
+    }
+
+    .btn-icon {
+      padding: .4rem;
+      border-radius: var(--radius);
+      background: none;
+      color: var(--text-secondary)
+    }
+
+    .btn-icon:hover {
+      background: var(--surface-alt);
+      color: var(--text)
+    }
+
+    /* Badge */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      padding: .15rem .55rem;
+      border-radius: 99px;
+      font-size: .72rem;
+      font-weight: 600
+    }
+
+    .badge-success {
+      background: var(--success-light);
+      color: var(--success)
+    }
+
+    .badge-warning {
+      background: var(--warning-light);
+      color: var(--warning)
+    }
+
+    .badge-danger {
+      background: var(--danger-light);
+      color: var(--danger)
+    }
+
+    .badge-primary {
+      background: var(--primary-light);
+      color: var(--primary)
+    }
+
+    /* Progress */
+    .progress-bar {
+      height: 8px;
+      background: var(--surface-alt);
+      border-radius: 99px;
+      overflow: hidden
+    }
+
+    .progress-fill {
+      height: 100%;
+      border-radius: 99px;
+      transition: width .4s ease
+    }
+
+    .progress-fill.blue {
+      background: linear-gradient(90deg, #2563eb, #60a5fa)
+    }
+
+    .progress-fill.green {
+      background: linear-gradient(90deg, #059669, #34d399)
+    }
+
+    .progress-fill.purple {
+      background: linear-gradient(90deg, #7c3aed, #a78bfa)
+    }
+
+    .progress-fill.orange {
+      background: linear-gradient(90deg, #d97706, #fbbf24)
+    }
+
+    .progress-fill.red {
+      background: linear-gradient(90deg, #dc2626, #f87171)
+    }
+
+    /* Budget Bars */
+    .budget-row {
+      margin-bottom: 1rem
+    }
+
+    .budget-info {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: .3rem;
+      font-size: .85rem
+    }
+
+    .budget-bar {
+      height: 22px;
+      background: var(--surface-alt);
+      border-radius: var(--radius);
+      position: relative;
+      overflow: hidden
+    }
+
+    .budget-fill {
+      height: 100%;
+      border-radius: var(--radius);
+      transition: width .4s;
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      padding-right: .5rem;
+      font-size: .7rem;
+      font-weight: 600;
+      color: #fff
+    }
+
+    /* Goal Cards */
+    .goals-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 1rem
+    }
+
+    .goal-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 1.25rem
+    }
+
+    .goal-card .goal-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: var(--radius);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
+      margin-bottom: .75rem
+    }
+
+    .goal-amounts {
+      display: flex;
+      justify-content: space-between;
+      font-size: .82rem;
+      margin: .4rem 0
+    }
+
+    /* Tabs */
+    .tab-row {
+      display: flex;
+      gap: .3rem;
+      border-bottom: 2px solid var(--border);
+      margin-bottom: 1.25rem
+    }
+
+    .tab-btn {
+      padding: .6rem 1rem;
+      font-size: .85rem;
+      font-weight: 500;
+      color: var(--text-secondary);
+      background: none;
+      border: none;
+      border-bottom: 2px solid transparent;
+      margin-bottom: -2px;
+      transition: all .15s;
+      cursor: pointer
+    }
+
+    .tab-btn.active {
+      color: var(--primary);
+      border-bottom-color: var(--primary)
+    }
+
+    .tab-btn:hover {
+      color: var(--text)
+    }
+
+    /* Filter Bar */
+    .filter-bar {
+      display: flex;
+      gap: .75rem;
+      align-items: center;
+      flex-wrap: wrap;
+      margin-bottom: 1rem
+    }
+
+    .filter-bar input,
+    .filter-bar select {
+      width: auto;
+      min-width: 160px
+    }
+
+    .search-input {
+      position: relative
+    }
+
+    .search-input input {
+      padding-left: 2rem
+    }
+
+    .search-input svg {
+      position: absolute;
+      left: .6rem;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 16px;
+      height: 16px;
+      color: var(--text-muted)
+    }
+
+    /* Empty State */
+    .empty-state {
+      text-align: center;
+      padding: 3rem 1rem;
+      color: var(--text-muted)
+    }
+
+    .empty-state svg {
+      width: 48px;
+      height: 48px;
+      margin-bottom: 1rem;
+      opacity: .4
+    }
+
+    .empty-state p {
+      font-size: .9rem
+    }
+
+    /* Toast */
+    .toast-container {
+      position: fixed;
+      top: 1rem;
+      right: 1rem;
+      z-index: 9999;
+      display: flex;
+      flex-direction: column;
+      gap: .5rem
+    }
+
+    .toast {
+      padding: .75rem 1rem;
+      border-radius: var(--radius);
+      font-size: .85rem;
+      font-weight: 500;
+      box-shadow: var(--shadow-lg);
+      animation: slideIn .3s ease;
+      display: flex;
+      align-items: center;
+      gap: .5rem;
+      max-width: 360px
+    }
+
+    .toast-success {
+      background: var(--success);
+      color: #fff
+    }
+
+    .toast-warning {
+      background: var(--warning);
+      color: #fff
+    }
+
+    .toast-danger {
+      background: var(--danger);
+      color: #fff
+    }
+
+    @keyframes slideIn {
+      from {
+        transform: translateX(100%);
+        opacity: 0
+      }
+
+      to {
+        transform: translateX(0);
+        opacity: 1
+      }
+    }
+
+    /* Modal */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, .4);
+      z-index: 200;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .2s
+    }
+
+    .modal-overlay.active {
+      opacity: 1;
+      pointer-events: all
+    }
+
+    .modal {
+      background: var(--surface);
+      border-radius: var(--radius-xl);
+      padding: 1.5rem;
+      max-width: 500px;
+      width: 90%;
+      max-height: 80vh;
+      overflow-y: auto;
+      box-shadow: var(--shadow-lg)
+    }
+
+    .modal h3 {
+      margin-bottom: 1rem
+    }
+
+    /* Section show/hide */
+    .section {
+      display: none
+    }
+
+    .section.active {
+      display: block
+    }
+
+    /* Scrollbar */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px
+    }
+
+    ::-webkit-scrollbar-track {
+      background: transparent
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: var(--border);
+      border-radius: 99px
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: var(--text-muted)
+    }
+
+    /* Mobile */
+    @media(max-width:768px) {
+      .sidebar {
+        transform: translateX(-100%)
+      }
+
+      .sidebar.open {
+        transform: translateX(0)
+      }
+
+      .main {
+        margin-left: 0
+      }
+
+      .hamburger {
+        display: block
+      }
+
+      .content {
+        padding: 1rem
+      }
+
+      .charts-grid {
+        grid-template-columns: 1fr
+      }
+
+      .metrics-grid {
+        grid-template-columns: repeat(auto-fit, minmax(160px, 1fr))
+      }
+
+      .form-grid {
+        grid-template-columns: 1fr
+      }
+
+      .topbar {
+        padding: .75rem 1rem
+      }
+    }
+
+    @media(max-width:480px) {
+      .metrics-grid {
+        grid-template-columns: 1fr
+      }
+
+      .goals-grid {
+        grid-template-columns: 1fr
+      }
+    }
+
+    /* Print */
+    @media print {
+
+      .sidebar,
+      .topbar,
+      .btn,
+      .form-section,
+      .filter-bar,
+      .toast-container,
+      .modal-overlay {
+        display: none !important
+      }
+
+      .main {
+        margin-left: 0
+      }
+
+      .content {
+        padding: 0
+      }
+
+      .card,
+      .metric-card,
+      .chart-container {
+        break-inside: avoid;
+        box-shadow: none;
+        border: 1px solid #ddd
+      }
+
+      body {
+        background: #fff
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- Sidebar -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-logo">
+      <svg viewBox="0 0 28 28" fill="none">
+        <circle cx="14" cy="14" r="13" stroke="#60a5fa" stroke-width="2" />
+        <path d="M9 18V12l5-4 5 4v6" stroke="#60a5fa" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+        <rect x="12" y="14" width="4" height="4" rx="1" fill="#60a5fa" />
+      </svg>
+      <h1>FinanceFlow <span>PRO</span></h1>
+    </div>
+    <nav id="mainNav"></nav>
+    <div class="sidebar-footer">© 2026 FinanceFlow<br>v1.0.0</div>
+  </aside>
+
+  <!-- Main -->
+  <div class="main">
+    <header class="topbar">
+      <div style="display:flex;align-items:center;gap:.75rem">
+        <button class="hamburger" onclick="document.getElementById('sidebar').classList.toggle('open')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="3" y1="6" x2="21" y2="6" />
+            <line x1="3" y1="12" x2="21" y2="12" />
+            <line x1="3" y1="18" x2="21" y2="18" />
+          </svg>
+        </button>
+        <h2 id="pageTitle">Dashboard</h2>
+      </div>
+      <div class="topbar-actions">
+        <span style="font-size:.82rem;color:var(--text-muted)" id="currentDate"></span>
+      </div>
+    </header>
+    <div class="content" id="appContent"></div>
+  </div>
+
+  <div class="toast-container" id="toastContainer"></div>
+  <div class="modal-overlay" id="modalOverlay" onclick="closeModal()">
+    <div class="modal" onclick="event.stopPropagation()" id="modalContent"></div>
+  </div>
+
+  <script>
+
+    // ═══════════════════════════════════════
+    // DATA LAYER
+    // ═══════════════════════════════════════
+    const DATA = {
+      incomes: [
+        { id: 1, source: 'Primary Salary', category: 'salary', amount: 5200, frequency: 'monthly', date: '2026-01-28' },
+        { id: 2, source: 'Freelance Consulting', category: 'side_income', amount: 1200, frequency: 'monthly', date: '2026-01-15' },
+        { id: 3, source: 'Dividend Portfolio', category: 'investments', amount: 350, frequency: 'monthly', date: '2026-01-10' },
+        { id: 4, source: 'Rental Income', category: 'passive', amount: 800, frequency: 'monthly', date: '2026-01-01' },
+      ],
+      expenses: [
+        { id: 1, description: 'Rent / Mortgage', category: 'housing', amount: 1450, date: '2026-01-01', recurring: true, paymentMethod: 'bank_transfer' },
+        { id: 2, description: 'Car Payment', category: 'transport', amount: 320, date: '2026-01-05', recurring: true, paymentMethod: 'debit' },
+        { id: 3, description: 'Groceries', category: 'food', amount: 480, date: '2026-01-08', recurring: false, paymentMethod: 'debit' },
+        { id: 4, description: 'Electric & Gas', category: 'utilities', amount: 145, date: '2026-01-10', recurring: true, paymentMethod: 'bank_transfer' },
+        { id: 5, description: 'Internet & Phone', category: 'utilities', amount: 85, date: '2026-01-10', recurring: true, paymentMethod: 'bank_transfer' },
+        { id: 6, description: 'Health Insurance', category: 'healthcare', amount: 210, date: '2026-01-12', recurring: true, paymentMethod: 'bank_transfer' },
+        { id: 7, description: 'Gym Membership', category: 'entertainment', amount: 45, date: '2026-01-15', recurring: true, paymentMethod: 'credit_card' },
+        { id: 8, description: 'Streaming Services', category: 'entertainment', amount: 35, date: '2026-01-15', recurring: true, paymentMethod: 'credit_card' },
+        { id: 9, description: 'Restaurants', category: 'food', amount: 220, date: '2026-01-20', recurring: false, paymentMethod: 'credit_card' },
+        { id: 10, description: 'Clothing', category: 'personal', amount: 150, date: '2026-01-22', recurring: false, paymentMethod: 'credit_card' },
+        { id: 11, description: 'Pet Care', category: 'personal', amount: 65, date: '2026-01-25', recurring: true, paymentMethod: 'debit' },
+        { id: 12, description: 'Home Insurance', category: 'housing', amount: 95, date: '2026-01-28', recurring: true, paymentMethod: 'bank_transfer' },
+      ],
+      budgets: [
+        { category: 'housing', allocated: 1600 }, { category: 'transport', allocated: 400 }, { category: 'food', allocated: 600 },
+        { category: 'utilities', allocated: 250 }, { category: 'healthcare', allocated: 250 }, { category: 'entertainment', allocated: 150 },
+        { category: 'personal', allocated: 300 }, { category: 'savings', allocated: 500 }, { category: 'education', allocated: 100 },
+      ],
+      investments: [
+        { id: 1, name: 'S&P 500 Index Fund', category: 'stocks', costBasis: 15000, currentValue: 18200, date: '2024-03-15' },
+        { id: 2, name: 'UK Govt Bonds', category: 'bonds', costBasis: 8000, currentValue: 8450, date: '2024-06-01' },
+        { id: 3, name: 'Property REIT', category: 'property', costBasis: 5000, currentValue: 5800, date: '2025-01-10' },
+        { id: 4, name: 'Bitcoin', category: 'crypto', costBasis: 3000, currentValue: 4100, date: '2025-06-20' },
+        { id: 5, name: 'Company Pension', category: 'pension', costBasis: 22000, currentValue: 26500, date: '2023-01-01' },
+        { id: 6, name: 'High-Yield Savings', category: 'cash', costBasis: 10000, currentValue: 10380, date: '2025-09-01' },
+      ],
+      debts: [
+        { id: 1, name: 'Mortgage', type: 'mortgage', balance: 185000, interestRate: 4.5, minPayment: 1100, startDate: '2022-06-01' },
+        { id: 2, name: 'Car Loan', type: 'loan', balance: 12500, interestRate: 6.2, minPayment: 320, startDate: '2024-01-15' },
+        { id: 3, name: 'Credit Card', type: 'credit_card', balance: 2800, interestRate: 19.9, minPayment: 85, startDate: '2025-03-01' },
+      ],
+      goals: [
+        { id: 1, name: 'Emergency Fund', category: 'emergency', targetAmount: 15000, currentAmount: 8500, deadline: '2026-12-31' },
+        { id: 2, name: 'House Renovations', category: 'house', targetAmount: 25000, currentAmount: 6200, deadline: '2027-06-30' },
+        { id: 3, name: 'Retirement Boost', category: 'retirement', targetAmount: 50000, currentAmount: 26500, deadline: '2035-01-01' },
+        { id: 4, name: 'Holiday Fund', category: 'education', targetAmount: 5000, currentAmount: 1800, deadline: '2026-08-01' },
+      ],
+      netWorthHistory: [
+        { month: 'Aug 2025', value: -128000 }, { month: 'Sep 2025', value: -125500 }, { month: 'Oct 2025', value: -122800 },
+        { month: 'Nov 2025', value: -119500 }, { month: 'Dec 2025', value: -116000 }, { month: 'Jan 2026', value: -112670 },
+      ]
+    };
+    let nextId = 100;
+
+    // ═══════════════════════════════════════
+    // UTILITIES
+    // ═══════════════════════════════════════
+    const fmt = n => '£' + Math.abs(n).toLocaleString('en-GB', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    const fmtPct = n => n.toFixed(1) + '%';
+    const fmtDate = d => new Date(d).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+    const sumBy = (arr, key) => arr.reduce((s, i) => s + Number(i[key] || 0), 0);
+    const monthlyAmount = item => {
+      const a = Number(item.amount);
+      if (item.frequency === 'weekly') return a * 52 / 12;
+      if (item.frequency === 'bi-weekly') return a * 26 / 12;
+      if (item.frequency === 'one-time') return a / 12;
+      return a;
+    };
+    const CATS = {
+      housing: 'Housing', transport: 'Transport', food: 'Food & Dining', utilities: 'Utilities',
+      healthcare: 'Healthcare', entertainment: 'Entertainment', personal: 'Personal',
+      savings: 'Savings', education: 'Education', other: 'Other'
+    };
+    const INCOME_CATS = { salary: 'Salary', investments: 'Investments', side_income: 'Side Income', passive: 'Passive Income', other: 'Other' };
+    const INVEST_CATS = { stocks: 'Stocks', bonds: 'Bonds', property: 'Property', cash: 'Cash', crypto: 'Crypto', pension: 'Pension' };
+    const DEBT_TYPES = { mortgage: 'Mortgage', loan: 'Loan', credit_card: 'Credit Card', student_loan: 'Student Loan' };
+    const GOAL_CATS = { emergency: 'Emergency Fund', house: 'House', retirement: 'Retirement', education: 'Education / Travel', other: 'Other' };
+    const PAY_METHODS = { credit_card: 'Credit Card', debit: 'Debit Card', cash: 'Cash', bank_transfer: 'Bank Transfer' };
+    const COLORS = ['#2563eb', '#7c3aed', '#059669', '#d97706', '#dc2626', '#0891b2', '#be185d', '#4f46e5', '#ca8a04', '#16a34a'];
+    const GOAL_COLORS = { emergency: 'blue', house: 'purple', retirement: 'green', education: 'orange', other: 'blue' };
+
+    function toast(msg, type = 'success') {
+      const c = document.getElementById('toastContainer');
+      const t = document.createElement('div');
+      t.className = 'toast toast-' + type;
+      t.textContent = msg;
+      c.appendChild(t);
+      setTimeout(() => t.remove(), 3000);
+    }
+    function closeModal() { document.getElementById('modalOverlay').classList.remove('active') }
+    function openModal(html) {
+      document.getElementById('modalContent').innerHTML = html;
+      document.getElementById('modalOverlay').classList.add('active');
+    }
+    function validate(form) {
+      let valid = true;
+      form.querySelectorAll('[required]').forEach(el => {
+        const g = el.closest('.form-group');
+        if (!el.value.trim()) { g.classList.add('error'); valid = false }
+        else { g.classList.remove('error') }
+      });
+      form.querySelectorAll('input[type="number"]').forEach(el => {
+        const g = el.closest('.form-group');
+        if (el.value && Number(el.value) < 0 && !el.dataset.allowNeg) { g.classList.add('error'); valid = false }
+      });
+      return valid;
+    }
+
+    // ═══════════════════════════════════════
+    // NAVIGATION
+    // ═══════════════════════════════════════
+    const SECTIONS = [
+      { id: 'dashboard', label: 'Dashboard', icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>' },
+      { id: 'income', label: 'Income', icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><polyline points="17 6 12 1 7 6"/><path d="M21 12H3"/></svg>' },
+      { id: 'expenses', label: 'Expenses', icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M16 8h-5a2 2 0 000 4h2a2 2 0 010 4H8"/><line x1="12" y1="6" x2="12" y2="8"/><line x1="12" y1="16" x2="12" y2="18"/></svg>' },
+      { id: 'budgets', label: 'Budgets', icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="18" rx="2"/><line x1="2" y1="9" x2="22" y2="9"/><line x1="10" y1="9" x2="10" y2="21"/></svg>' },
+      { id: 'investments', label: 'Investments', icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>' },
+      { id: 'debts', label: 'Debts', icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>' },
+      { id: 'goals', label: 'Goals', icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>' },
+      { id: 'reports', label: 'Reports', icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>' },
+    ];
+    let currentSection = 'dashboard';
+    function initNav() {
+      const nav = document.getElementById('mainNav');
+      nav.innerHTML = SECTIONS.map(s => `<div class="nav-item${s.id === currentSection ? ' active' : ''}" data-section="${s.id}" onclick="navigate('${s.id}')">${s.icon}<span>${s.label}</span></div>`).join('');
+    }
+    function navigate(id) {
+      currentSection = id;
+      document.querySelectorAll('.nav-item').forEach(n => n.classList.toggle('active', n.dataset.section === id));
+      document.getElementById('pageTitle').textContent = SECTIONS.find(s => s.id === id).label;
+      document.getElementById('sidebar').classList.remove('open');
+      render();
+    }
+    function render() {
+      const c = document.getElementById('appContent');
+      const renderers = { dashboard: renderDashboard, income: renderIncome, expenses: renderExpenses, budgets: renderBudgets, investments: renderInvestments, debts: renderDebts, goals: renderGoals, reports: renderReports };
+      c.innerHTML = '';
+      (renderers[currentSection] || renderDashboard)(c);
+    }
+
+    // ═══════════════════════════════════════
+    // CALCULATIONS
+    // ═══════════════════════════════════════
+    function calcMonthlyIncome() { return DATA.incomes.reduce((s, i) => s + monthlyAmount(i), 0) }
+    function calcMonthlyExpenses() { return sumBy(DATA.expenses, 'amount') }
+    function calcTotalAssets() { return sumBy(DATA.investments, 'currentValue') }
+    function calcTotalDebts() { return sumBy(DATA.debts, 'balance') }
+    function calcNetWorth() { return calcTotalAssets() - calcTotalDebts() }
+    function calcSavingsRate() { const i = calcMonthlyIncome(); return i ? ((i - calcMonthlyExpenses()) / i) * 100 : 0 }
+    function calcDebtToIncome() { const i = calcMonthlyIncome(); return i ? (sumBy(DATA.debts, 'minPayment') / i) * 100 : 0 }
+    function getExpensesByCategory() {
+      const map = {};
+      DATA.expenses.forEach(e => { map[e.category] = (map[e.category] || 0) + Number(e.amount) });
+      return Object.entries(map).sort((a, b) => b[1] - a[1]);
+    }
+    function getBudgetVsActual() {
+      const actual = {};
+      DATA.expenses.forEach(e => { actual[e.category] = (actual[e.category] || 0) + Number(e.amount) });
+      return DATA.budgets.map(b => ({ category: b.category, allocated: b.allocated, actual: actual[b.category] || 0, variance: b.allocated - (actual[b.category] || 0) }));
+    }
+
+    // ═══════════════════════════════════════
+    // CANVAS CHARTS
+    // ═══════════════════════════════════════
+    function drawPieChart(canvasId, dataArr, labelArr, colorArr) {
+      setTimeout(() => {
+        const canvas = document.getElementById(canvasId); if (!canvas) return;
+        const ctx = canvas.getContext('2d');
+        const dpr = window.devicePixelRatio || 1;
+        const rect = canvas.getBoundingClientRect();
+        canvas.width = rect.width * dpr; canvas.height = rect.height * dpr;
+        ctx.scale(dpr, dpr);
+        const w = rect.width, h = rect.height, cx = w * 0.38, cy = h / 2, r = Math.min(cx, cy) - 20;
+        const total = dataArr.reduce((s, v) => s + v, 0);
+        if (!total) return;
+        let startAngle = -Math.PI / 2;
+        dataArr.forEach((val, i) => {
+          const slice = val / total * Math.PI * 2;
+          ctx.beginPath(); ctx.moveTo(cx, cy); ctx.arc(cx, cy, r, startAngle, startAngle + slice); ctx.closePath();
+          ctx.fillStyle = colorArr[i % colorArr.length]; ctx.fill();
+          startAngle += slice;
+        });
+        // Inner circle for donut
+        ctx.beginPath(); ctx.arc(cx, cy, r * 0.55, 0, Math.PI * 2); ctx.fillStyle = getComputedStyle(document.body).getPropertyValue('--surface').trim() || '#fff'; ctx.fill();
+        // Center text
+        ctx.fillStyle = getComputedStyle(document.body).getPropertyValue('--text').trim() || '#1a1a2e';
+        ctx.font = 'bold 14px Inter'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+        ctx.fillText(fmt(total), cx, cy - 6);
+        ctx.font = '11px Inter'; ctx.fillStyle = getComputedStyle(document.body).getPropertyValue('--text-secondary').trim() || '#6b7280';
+        ctx.fillText('Total', cx, cy + 10);
+        // Legend
+        let ly = 20; const lx = w * 0.72;
+        ctx.textAlign = 'left';
+        labelArr.forEach((label, i) => {
+          ctx.fillStyle = colorArr[i % colorArr.length];
+          ctx.fillRect(lx, ly, 10, 10);
+          ctx.fillStyle = getComputedStyle(document.body).getPropertyValue('--text').trim() || '#1a1a2e';
+          ctx.font = '11px Inter';
+          const pct = ((dataArr[i] / total) * 100).toFixed(1);
+          ctx.fillText(`${label} (${pct}%)`, lx + 16, ly + 9);
+          ly += 22;
+        });
+      }, 50);
+    }
+    function drawLineChart(canvasId, labels, values) {
+      setTimeout(() => {
+        const canvas = document.getElementById(canvasId); if (!canvas) return;
+        const ctx = canvas.getContext('2d');
+        const dpr = window.devicePixelRatio || 1;
+        const rect = canvas.getBoundingClientRect();
+        canvas.width = rect.width * dpr; canvas.height = rect.height * dpr;
+        ctx.scale(dpr, dpr);
+        const w = rect.width, h = rect.height;
+        const pad = { t: 20, r: 20, b: 40, l: 70 };
+        const cw = w - pad.l - pad.r, ch = h - pad.t - pad.b;
+        const mn = Math.min(...values), mx = Math.max(...values);
+        const range = mx - mn || 1;
+        const getX = i => pad.l + (i / (values.length - 1)) * cw;
+        const getY = v => pad.t + ch - (((v - mn) / range) * ch);
+        // Grid
+        ctx.strokeStyle = '#e5e7eb'; ctx.lineWidth = 1;
+        for (let i = 0; i <= 4; i++) {
+          const y = pad.t + (ch / 4) * i;
+          ctx.beginPath(); ctx.moveTo(pad.l, y); ctx.lineTo(w - pad.r, y); ctx.stroke();
+          const val = mx - ((mx - mn) / 4) * i;
+          ctx.fillStyle = '#9ca3af'; ctx.font = '10px Inter'; ctx.textAlign = 'right'; ctx.textBaseline = 'middle';
+          ctx.fillText(fmt(val), pad.l - 8, y);
+        }
+        // Labels
+        ctx.textAlign = 'center'; ctx.textBaseline = 'top';
+        labels.forEach((l, i) => { ctx.fillStyle = '#9ca3af'; ctx.font = '10px Inter'; ctx.fillText(l, getX(i), h - pad.b + 10) });
+        // Gradient fill
+        const grad = ctx.createLinearGradient(0, pad.t, 0, h - pad.b);
+        grad.addColorStop(0, 'rgba(37,99,235,0.15)'); grad.addColorStop(1, 'rgba(37,99,235,0)');
+        ctx.beginPath(); ctx.moveTo(getX(0), getY(values[0]));
+        values.forEach((v, i) => { if (i > 0) ctx.lineTo(getX(i), getY(v)) });
+        ctx.lineTo(getX(values.length - 1), h - pad.b); ctx.lineTo(getX(0), h - pad.b); ctx.closePath();
+        ctx.fillStyle = grad; ctx.fill();
+        // Line
+        ctx.beginPath(); ctx.moveTo(getX(0), getY(values[0]));
+        values.forEach((v, i) => { if (i > 0) ctx.lineTo(getX(i), getY(v)) });
+        ctx.strokeStyle = '#2563eb'; ctx.lineWidth = 2.5; ctx.lineJoin = 'round'; ctx.stroke();
+        // Dots
+        values.forEach((v, i) => {
+          ctx.beginPath(); ctx.arc(getX(i), getY(v), 4, 0, Math.PI * 2); ctx.fillStyle = '#2563eb'; ctx.fill();
+          ctx.beginPath(); ctx.arc(getX(i), getY(v), 2, 0, Math.PI * 2); ctx.fillStyle = '#fff'; ctx.fill();
+        });
+      }, 50);
+    }
+
+    // ═══════════════════════════════════════
+    // DASHBOARD
+    // ═══════════════════════════════════════
+    function renderDashboard(c) {
+      const income = calcMonthlyIncome(), expenses = calcMonthlyExpenses(), net = calcNetWorth();
+      const savingsRate = calcSavingsRate(), dti = calcDebtToIncome(), cashflow = income - expenses;
+      c.innerHTML = `
+    <div class="metrics-grid">
+      <div class="metric-card blue"><div class="metric-label">Net Worth</div><div class="metric-value">${fmt(net)}</div><div class="metric-sub ${net >= 0 ? 'positive' : 'negative'}">${net >= 0 ? '▲' : '▼'} Assets: ${fmt(calcTotalAssets())} — Debts: ${fmt(calcTotalDebts())}</div></div>
+      <div class="metric-card ${cashflow >= 0 ? 'green' : 'red'}"><div class="metric-label">Monthly Cash Flow</div><div class="metric-value">${cashflow >= 0 ? '+' : '−'}${fmt(cashflow)}</div><div class="metric-sub">Income ${fmt(income)} — Expenses ${fmt(expenses)}</div></div>
+      <div class="metric-card purple"><div class="metric-label">Savings Rate</div><div class="metric-value">${fmtPct(savingsRate)}</div><div class="metric-sub ${savingsRate >= 20 ? 'positive' : 'negative'}">${savingsRate >= 20 ? '✓ On track' : '⚠ Below 20% target'}</div></div>
+      <div class="metric-card orange"><div class="metric-label">Debt-to-Income</div><div class="metric-value">${fmtPct(dti)}</div><div class="metric-sub ${dti <= 36 ? 'positive' : 'negative'}">${dti <= 36 ? '✓ Healthy ratio' : '⚠ Above 36% threshold'}</div></div>
+    </div>
+    <div class="charts-grid">
+      <div class="chart-container"><div class="card-header"><span class="card-title">Expense Breakdown</span></div><canvas id="pieChart" style="height:280px"></canvas></div>
+      <div class="chart-container"><div class="card-header"><span class="card-title">Net Worth Trend</span></div><canvas id="lineChart" style="height:280px"></canvas></div>
+    </div>
+    <div class="form-section"><h3>Budget vs Actual</h3><div id="budgetBars"></div></div>
+  `;
+      // Pie chart
+      const expCats = getExpensesByCategory();
+      drawPieChart('pieChart', expCats.map(e => e[1]), expCats.map(e => CATS[e[0]] || e[0]), COLORS);
+      // Line chart
+      const hist = DATA.netWorthHistory;
+      drawLineChart('lineChart', hist.map(h => h.month), hist.map(h => h.value));
+      // Budget bars
+      const bars = document.getElementById('budgetBars');
+      getBudgetVsActual().forEach(b => {
+        const pct = b.allocated ? Math.min((b.actual / b.allocated) * 100, 100) : 0;
+        const over = b.actual > b.allocated;
+      });
+    }
+
+    // ═══════════════════════════════════════
+    // HELPER: Dropdown options
+    // ═══════════════════════════════════════
+    function opts(map, selected) { return Object.entries(map).map(([k, v]) => `<option value="${k}"${k === selected ? ' selected' : ''}>${v}</option>`).join('') }
+
+    // ═══════════════════════════════════════
+    // INCOME
+    // ═══════════════════════════════════════
+    function renderIncome(c) {
+      const ytd = DATA.incomes.reduce((s, i) => s + monthlyAmount(i), 0) * 1; // current month
+      const monthly = calcMonthlyIncome();
+      c.innerHTML = `
+    <div class="metrics-grid">
+      <div class="metric-card green"><div class="metric-label">Monthly Income</div><div class="metric-value">${fmt(monthly)}</div></div>
+      <div class="metric-card blue"><div class="metric-label">Annual Projection</div><div class="metric-value">${fmt(monthly * 12)}</div></div>
+      <div class="metric-card purple"><div class="metric-label">Income Sources</div><div class="metric-value">${DATA.incomes.length}</div></div>
+    </div>
+    <div class="form-section"><h3>Add Income Source</h3>
+      <form id="incomeForm" onsubmit="addIncome(event)">
+        <div class="form-grid">
+          <div class="form-group"><label>Source Name</label><input type="text" id="incSource" required><div class="form-error">Required</div></div>
+          <div class="form-group"><label>Category</label><select id="incCategory" required>${opts(INCOME_CATS)}</select></div>
+          <div class="form-group"><label>Amount (£)</label><input type="number" id="incAmount" step="0.01" min="0" required><div class="form-error">Enter a positive amount</div></div>
+          <div class="form-group"><label>Frequency</label><select id="incFrequency"><option value="monthly">Monthly</option><option value="bi-weekly">Bi-Weekly</option><option value="weekly">Weekly</option><option value="one-time">One-Time</option></select></div>
+          <div class="form-group"><label>Date</label><input type="date" id="incDate" required><div class="form-error">Required</div></div>
+        </div>
+        <div class="form-actions"><button type="submit" class="btn btn-primary">+ Add Income</button></div>
+      </form>
+    </div>
+    <div class="form-section"><h3>Income Sources</h3>
+      <div style="overflow-x:auto"><table><thead><tr><th>Source</th><th>Category</th><th>Amount</th><th>Frequency</th><th>Date</th><th>Monthly Eq.</th><th></th></tr></thead><tbody id="incomeTable"></tbody></table></div>
+    </div>
+  `;
+      document.getElementById('incDate').value = new Date().toISOString().split('T')[0];
+      renderIncomeTable();
+    }
+    function renderIncomeTable() {
+      const tb = document.getElementById('incomeTable'); if (!tb) return;
+      tb.innerHTML = DATA.incomes.map(i => `<tr><td>${i.source}</td><td><span class="badge badge-primary">${INCOME_CATS[i.category] || i.category}</span></td><td>${fmt(i.amount)}</td><td style="text-transform:capitalize">${i.frequency.replace('_', ' ')}</td><td>${fmtDate(i.date)}</td><td>${fmt(monthlyAmount(i))}</td><td><button class="btn btn-sm btn-danger" onclick="deleteIncome(${i.id})">✕</button></td></tr>`).join('');
+    }
+    function addIncome(e) {
+      e.preventDefault(); const f = e.target; if (!validate(f)) return;
+      DATA.incomes.push({ id: ++nextId, source: f.incSource.value, category: f.incCategory.value, amount: Number(f.incAmount.value), frequency: f.incFrequency.value, date: f.incDate.value });
+      f.reset(); f.incDate.value = new Date().toISOString().split('T')[0]; toast('Income source added'); renderIncomeTable();
+    }
+    function deleteIncome(id) { DATA.incomes = DATA.incomes.filter(i => i.id !== id); toast('Income removed', 'warning'); renderIncomeTable() }
+
+    // ═══════════════════════════════════════
+    // EXPENSES
+    // ═══════════════════════════════════════
+    let expFilter = { search: '', category: '', method: '' };
+    function renderExpenses(c) {
+      const total = calcMonthlyExpenses();
+      const recurring = DATA.expenses.filter(e => e.recurring).reduce((s, e) => s + Number(e.amount), 0);
+      c.innerHTML = `
+    <div class="metrics-grid">
+      <div class="metric-card red"><div class="metric-label">Total Expenses</div><div class="metric-value">${fmt(total)}</div></div>
+      <div class="metric-card orange"><div class="metric-label">Recurring</div><div class="metric-value">${fmt(recurring)}</div></div>
+      <div class="metric-card blue"><div class="metric-label">One-Time</div><div class="metric-value">${fmt(total - recurring)}</div></div>
+      <div class="metric-card green"><div class="metric-label">Transactions</div><div class="metric-value">${DATA.expenses.length}</div></div>
+    </div>
+    <div class="form-section"><h3>Add Expense</h3>
+      <form id="expenseForm" onsubmit="addExpense(event)">
+        <div class="form-grid">
+          <div class="form-group"><label>Description</label><input type="text" id="expDesc" required><div class="form-error">Required</div></div>
+          <div class="form-group"><label>Category</label><select id="expCategory" required>${opts(CATS)}</select></div>
+          <div class="form-group"><label>Amount (£)</label><input type="number" id="expAmount" step="0.01" min="0" required><div class="form-error">Enter a positive amount</div></div>
+          <div class="form-group"><label>Date</label><input type="date" id="expDate" required><div class="form-error">Required</div></div>
+          <div class="form-group"><label>Payment Method</label><select id="expMethod">${opts(PAY_METHODS)}</select></div>
+          <div class="form-group"><label style="display:flex;align-items:center;gap:.5rem"><input type="checkbox" id="expRecurring" style="width:auto"> Recurring</label></div>
+        </div>
+        <div class="form-actions"><button type="submit" class="btn btn-primary">+ Add Expense</button></div>
+      </form>
+    </div>
+    <div class="form-section"><h3>Expense List</h3>
+      <div class="filter-bar">
+        <div class="search-input"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg><input type="text" placeholder="Search expenses..." value="${expFilter.search}" oninput="expFilter.search=this.value;renderExpTable()"></div>
+        <select onchange="expFilter.category=this.value;renderExpTable()"><option value="">All Categories</option>${opts(CATS, expFilter.category)}</select>
+        <select onchange="expFilter.method=this.value;renderExpTable()"><option value="">All Methods</option>${opts(PAY_METHODS, expFilter.method)}</select>
+      </div>
+      <div style="overflow-x:auto"><table><thead><tr><th>Description</th><th>Category</th><th>Amount</th><th>Date</th><th>Method</th><th>Type</th><th></th></tr></thead><tbody id="expTable"></tbody></table></div>
+    </div>
+  `;
+      document.getElementById('expDate').value = new Date().toISOString().split('T')[0];
+      renderExpTable();
+    }
+    function renderExpTable() {
+      const tb = document.getElementById('expTable'); if (!tb) return;
+      let items = DATA.expenses.slice();
+      if (expFilter.search) { const s = expFilter.search.toLowerCase(); items = items.filter(e => e.description.toLowerCase().includes(s)) }
+      if (expFilter.category) items = items.filter(e => e.category === expFilter.category);
+      if (expFilter.method) items = items.filter(e => e.paymentMethod === expFilter.method);
+      tb.innerHTML = items.map(e => `<tr><td>${e.description}</td><td><span class="badge badge-primary">${CATS[e.category] || e.category}</span></td><td>${fmt(e.amount)}</td><td>${fmtDate(e.date)}</td><td>${PAY_METHODS[e.paymentMethod] || e.paymentMethod}</td><td>${e.recurring ? '<span class="badge badge-warning">Recurring</span>' : '<span class="badge badge-success">One-time</span>'}</td><td><button class="btn btn-sm btn-danger" onclick="deleteExpense(${e.id})">✕</button></td></tr>`).join('');
+      if (!items.length) tb.innerHTML = '<tr><td colspan="7" class="empty-state"><p>No expenses match your filters</p></td></tr>';
+    }
+    function addExpense(e) {
+      e.preventDefault(); const f = e.target; if (!validate(f)) return;
+      DATA.expenses.push({ id: ++nextId, description: f.expDesc.value, category: f.expCategory.value, amount: Number(f.expAmount.value), date: f.expDate.value, recurring: f.expRecurring.checked, paymentMethod: f.expMethod.value });
+      f.reset(); f.expDate.value = new Date().toISOString().split('T')[0]; toast('Expense added'); renderExpTable();
+    }
+    function deleteExpense(id) { DATA.expenses = DATA.expenses.filter(e => e.id !== id); toast('Expense removed', 'warning'); renderExpTable() }
+
+    // ═══════════════════════════════════════
+    // BUDGETS
+    // ═══════════════════════════════════════
+    function renderBudgets(c) {
+      const totalBudget = sumBy(DATA.budgets, 'allocated');
+      const totalSpent = calcMonthlyExpenses();
+      const remaining = totalBudget - totalSpent;
+      const income = calcMonthlyIncome();
+      c.innerHTML = `
+    <div class="metrics-grid">
+      <div class="metric-card blue"><div class="metric-label">Total Budget</div><div class="metric-value">${fmt(totalBudget)}</div></div>
+      <div class="metric-card ${remaining >= 0 ? 'green' : 'red'}"><div class="metric-label">Remaining</div><div class="metric-value">${remaining >= 0 ? '' : '-'}${fmt(remaining)}</div></div>
+      <div class="metric-card purple"><div class="metric-label">Budget Utilisation</div><div class="metric-value">${totalBudget ? fmtPct((totalSpent / totalBudget) * 100) : '0%'}</div></div>
+      <div class="metric-card orange"><div class="metric-label">Annual Budget</div><div class="metric-value">${fmt(totalBudget * 12)}</div></div>
+    </div>
+    <div class="form-section"><h3>50/30/20 Rule Recommendation</h3>
+      <p style="font-size:.85rem;color:var(--text-secondary);margin-bottom:1rem">Based on monthly income of ${fmt(income)}</p>
+      <div class="budget-row"><div class="budget-info"><span>Needs (50%) — Housing, Utilities, Healthcare, Transport</span><span>${fmt(income * 0.5)}</span></div><div class="budget-bar"><div class="budget-fill blue" style="width:50%">50%</div></div></div>
+      <div class="budget-row"><div class="budget-info"><span>Wants (30%) — Entertainment, Food, Personal</span><span>${fmt(income * 0.3)}</span></div><div class="budget-bar"><div class="budget-fill purple" style="width:30%">30%</div></div></div>
+      <div class="budget-row"><div class="budget-info"><span>Savings (20%) — Savings, Investments, Debt Repayment</span><span>${fmt(income * 0.2)}</span></div><div class="budget-bar"><div class="budget-fill green" style="width:20%">20%</div></div></div>
+    </div>
+    <div class="form-section"><h3>Budget Allocation</h3>
+      <div style="overflow-x:auto"><table><thead><tr><th>Category</th><th>Allocated</th><th>Actual</th><th>Variance</th><th>Status</th><th></th></tr></thead><tbody id="budgetTable"></tbody><tfoot><tr style="font-weight:700"><td>Total</td><td>${fmt(totalBudget)}</td><td>${fmt(totalSpent)}</td><td class="${remaining >= 0 ? '' : 'metric-sub negative'}">${remaining >= 0 ? '+' : '-'}${fmt(remaining)}</td><td></td><td></td></tr></tfoot></table></div>
+    </div>
+    <div class="form-section"><h3>Add Budget Category</h3>
+      <form onsubmit="addBudget(event)"><div class="form-grid">
+        <div class="form-group"><label>Category</label><select id="budCat" required>${opts(CATS)}</select></div>
+        <div class="form-group"><label>Monthly Amount (£)</label><input type="number" id="budAmount" step="0.01" min="0" required></div>
+      </div><div class="form-actions"><button type="submit" class="btn btn-primary">+ Add / Update</button></div></form>
+    </div>
+  `;
+      renderBudgetTable();
+    }
+    function renderBudgetTable() {
+      const tb = document.getElementById('budgetTable'); if (!tb) return;
+      const bva = getBudgetVsActual();
+      tb.innerHTML = bva.map(b => {
+        const pct = b.allocated ? ((b.actual / b.allocated) * 100) : 0;
+        const status = b.actual > b.allocated ? '<span class="badge badge-danger">Over Budget</span>' : pct > 80 ? '<span class="badge badge-warning">Near Limit</span>' : '<span class="badge badge-success">On Track</span>';
+        return `<tr><td>${CATS[b.category] || b.category}</td><td>${fmt(b.allocated)}</td><td>${fmt(b.actual)}</td><td class="${b.variance >= 0 ? '' : 'metric-sub negative'}">${b.variance >= 0 ? '+' : '-'}${fmt(b.variance)}</td><td>${status}</td><td><button class="btn btn-sm btn-danger" onclick="deleteBudget('${b.category}')">✕</button></td></tr>`;
+      }).join('');
+    }
+    function addBudget(e) {
+      e.preventDefault(); const cat = document.getElementById('budCat').value, amt = Number(document.getElementById('budAmount').value);
+      const existing = DATA.budgets.find(b => b.category === cat);
+      if (existing) { existing.allocated = amt } else { DATA.budgets.push({ category: cat, allocated: amt }) }
+      toast('Budget updated'); render();
+    }
+    function deleteBudget(cat) { DATA.budgets = DATA.budgets.filter(b => b.category !== cat); toast('Budget removed', 'warning'); render() }
+
+    // ═══════════════════════════════════════
+    // INVESTMENTS
+    // ═══════════════════════════════════════
+    function renderInvestments(c) {
+      const totalCost = sumBy(DATA.investments, 'costBasis'), totalVal = sumBy(DATA.investments, 'currentValue');
+      const totalReturn = totalCost ? ((totalVal - totalCost) / totalCost) * 100 : 0;
+      c.innerHTML = `
+    <div class="metrics-grid">
+      <div class="metric-card blue"><div class="metric-label">Portfolio Value</div><div class="metric-value">${fmt(totalVal)}</div></div>
+      <div class="metric-card purple"><div class="metric-label">Cost Basis</div><div class="metric-value">${fmt(totalCost)}</div></div>
+      <div class="metric-card ${totalReturn >= 0 ? 'green' : 'red'}"><div class="metric-label">Total Return</div><div class="metric-value">${totalReturn >= 0 ? '+' : ''}${fmtPct(totalReturn)}</div><div class="metric-sub">${totalReturn >= 0 ? '+' : '-'}${fmt(totalVal - totalCost)}</div></div>
+      <div class="metric-card orange"><div class="metric-label">Holdings</div><div class="metric-value">${DATA.investments.length}</div></div>
+    </div>
+    <div class="charts-grid">
+      <div class="chart-container"><div class="card-header"><span class="card-title">Asset Allocation</span></div><canvas id="investPie" style="height:280px"></canvas></div>
+      <div class="form-section" style="margin:0"><h3>Diversification</h3><div id="diversBars"></div></div>
+    </div>
+    <div class="form-section"><h3>Add Investment</h3>
+      <form onsubmit="addInvestment(event)"><div class="form-grid">
+        <div class="form-group"><label>Name</label><input type="text" id="invName" required><div class="form-error">Required</div></div>
+        <div class="form-group"><label>Category</label><select id="invCat" required>${opts(INVEST_CATS)}</select></div>
+        <div class="form-group"><label>Cost Basis (£)</label><input type="number" id="invCost" step="0.01" min="0" required></div>
+        <div class="form-group"><label>Current Value (£)</label><input type="number" id="invVal" step="0.01" min="0" required></div>
+        <div class="form-group"><label>Date Acquired</label><input type="date" id="invDate" required></div>
+      </div><div class="form-actions"><button type="submit" class="btn btn-primary">+ Add Investment</button></div></form>
+    </div>
+    <div class="form-section"><h3>Portfolio Holdings</h3>
+      <div style="overflow-x:auto"><table><thead><tr><th>Name</th><th>Category</th><th>Cost Basis</th><th>Current Value</th><th>Return</th><th>% of Portfolio</th><th></th></tr></thead><tbody id="invTable"></tbody></table></div>
+    </div>
+  `;
+      // Allocation pie
+      const byCat = {}; DATA.investments.forEach(i => { byCat[i.category] = (byCat[i.category] || 0) + i.currentValue });
+      const catEntries = Object.entries(byCat).sort((a, b) => b[1] - a[1]);
+      drawPieChart('investPie', catEntries.map(e => e[1]), catEntries.map(e => INVEST_CATS[e[0]] || e[0]), COLORS);
+      // Diversification bars
+      const db = document.getElementById('diversBars');
+      catEntries.forEach((e, i) => {
+        const pct = totalVal ? (e[1] / totalVal) * 100 : 0;
+        db.innerHTML += `<div class="budget-row"><div class="budget-info"><span>${INVEST_CATS[e[0]] || e[0]}</span><span>${fmt(e[1])} (${fmtPct(pct)})</span></div><div class="budget-bar"><div class="budget-fill blue" style="width:${pct}%;background:${COLORS[i % COLORS.length]}">${pct.toFixed(0)}%</div></div></div>`;
+      });
+      renderInvTable();
+    }
+    function renderInvTable() {
+      const tb = document.getElementById('invTable'); if (!tb) return;
+      const tv = sumBy(DATA.investments, 'currentValue');
+      tb.innerHTML = DATA.investments.map(i => {
+        const ret = i.costBasis ? ((i.currentValue - i.costBasis) / i.costBasis) * 100 : 0;
+        const pctPort = tv ? (i.currentValue / tv) * 100 : 0;
+        return `<tr><td>${i.name}</td><td><span class="badge badge-primary">${INVEST_CATS[i.category] || i.category}</span></td><td>${fmt(i.costBasis)}</td><td>${fmt(i.currentValue)}</td><td class="${ret >= 0 ? 'metric-sub positive' : 'metric-sub negative'}">${ret >= 0 ? '+' : ''}${fmtPct(ret)}</td><td>${fmtPct(pctPort)}</td><td><button class="btn btn-sm btn-danger" onclick="deleteInvestment(${i.id})">✕</button></td></tr>`;
+      }).join('');
+    }
+    function addInvestment(e) {
+      e.preventDefault(); const f = e.target; if (!validate(f)) return;
+      DATA.investments.push({ id: ++nextId, name: f.invName.value, category: f.invCat.value, costBasis: Number(f.invCost.value), currentValue: Number(f.invVal.value), date: f.invDate.value });
+      f.reset(); toast('Investment added'); renderInvTable();
+    }
+    function deleteInvestment(id) { DATA.investments = DATA.investments.filter(i => i.id !== id); toast('Investment removed', 'warning'); render() }
+
+    // ═══════════════════════════════════════
+    // DEBTS
+    // ═══════════════════════════════════════
+    function renderDebts(c) {
+      const totalDebt = calcTotalDebts(); const totalMin = sumBy(DATA.debts, 'minPayment');
+      const avgRate = DATA.debts.length ? DATA.debts.reduce((s, d) => s + Number(d.interestRate), 0) / DATA.debts.length : 0;
+      c.innerHTML = `
+    <div class="metrics-grid">
+      <div class="metric-card red"><div class="metric-label">Total Debt</div><div class="metric-value">${fmt(totalDebt)}</div></div>
+      <div class="metric-card orange"><div class="metric-label">Monthly Payments</div><div class="metric-value">${fmt(totalMin)}</div></div>
+      <div class="metric-card purple"><div class="metric-label">Avg Interest Rate</div><div class="metric-value">${fmtPct(avgRate)}</div></div>
+      <div class="metric-card blue"><div class="metric-label">Debt-to-Income</div><div class="metric-value">${fmtPct(calcDebtToIncome())}</div></div>
+    </div>
+    <div class="form-section"><h3>Debt Burden</h3><div id="debtBars"></div></div>
+    <div class="form-section"><h3>Add Debt</h3>
+      <form onsubmit="addDebt(event)"><div class="form-grid">
+        <div class="form-group"><label>Name</label><input type="text" id="debtName" required><div class="form-error">Required</div></div>
+        <div class="form-group"><label>Type</label><select id="debtType" required>${opts(DEBT_TYPES)}</select></div>
+        <div class="form-group"><label>Balance (£)</label><input type="number" id="debtBal" step="0.01" min="0" required></div>
+        <div class="form-group"><label>Interest Rate (%)</label><input type="number" id="debtRate" step="0.01" min="0" required></div>
+        <div class="form-group"><label>Min Monthly Payment (£)</label><input type="number" id="debtMin" step="0.01" min="0" required></div>
+        <div class="form-group"><label>Start Date</label><input type="date" id="debtDate" required></div>
+      </div><div class="form-actions"><button type="submit" class="btn btn-primary">+ Add Debt</button></div></form>
+    </div>
+    <div class="form-section"><h3>Debt Overview</h3>
+      <div style="overflow-x:auto"><table><thead><tr><th>Name</th><th>Type</th><th>Balance</th><th>Rate</th><th>Min Payment</th><th>Est. Payoff</th><th></th></tr></thead><tbody id="debtTable"></tbody></table></div>
+    </div>
+  `;
+      const db = document.getElementById('debtBars');
+      DATA.debts.forEach((d, i) => {
+        const pct = totalDebt ? (d.balance / totalDebt) * 100 : 0;
+        db.innerHTML += `<div class="budget-row"><div class="budget-info"><span>${d.name} (${fmtPct(d.interestRate)} APR)</span><span>${fmt(d.balance)}</span></div><div class="budget-bar"><div class="budget-fill red" style="width:${pct}%;background:${COLORS[i % COLORS.length]}">${pct.toFixed(0)}%</div></div></div>`;
+      });
+      renderDebtTable();
+    }
+    function renderDebtTable() {
+      const tb = document.getElementById('debtTable'); if (!tb) return;
+      tb.innerHTML = DATA.debts.map(d => {
+        const months = d.minPayment > 0 ? Math.ceil(d.balance / d.minPayment) : 0;
+        const years = Math.floor(months / 12), rem = months % 12;
+        const payoff = months ? `~${years ? years + 'y ' : ''}${rem}m` : 'N/A';
+        return `<tr><td>${d.name}</td><td><span class="badge badge-primary">${DEBT_TYPES[d.type] || d.type}</span></td><td>${fmt(d.balance)}</td><td>${fmtPct(d.interestRate)}</td><td>${fmt(d.minPayment)}</td><td>${payoff}</td><td><button class="btn btn-sm btn-danger" onclick="deleteDebt(${d.id})">✕</button></td></tr>`;
+      }).join('');
+    }
+    function addDebt(e) {
+      e.preventDefault(); const f = e.target; if (!validate(f)) return;
+      DATA.debts.push({ id: ++nextId, name: f.debtName.value, type: f.debtType.value, balance: Number(f.debtBal.value), interestRate: Number(f.debtRate.value), minPayment: Number(f.debtMin.value), startDate: f.debtDate.value });
+      f.reset(); toast('Debt added'); render();
+    }
+    function deleteDebt(id) { DATA.debts = DATA.debts.filter(d => d.id !== id); toast('Debt removed', 'warning'); render() }
+
+    // ═══════════════════════════════════════
+    // GOALS
+    // ═══════════════════════════════════════
+    function renderGoals(c) {
+      const ICONS = { emergency: '🛡️', house: '🏠', retirement: '🏖️', education: '✈️', other: '🎯' };
+      const BGCOLORS = { emergency: 'var(--primary-light)', house: 'var(--accent-light)', retirement: 'var(--success-light)', education: 'var(--warning-light)', other: 'var(--surface-alt)' };
+      c.innerHTML = `
+    <div class="form-section"><h3>Add Goal</h3>
+      <form onsubmit="addGoal(event)"><div class="form-grid">
+        <div class="form-group"><label>Goal Name</label><input type="text" id="goalName" required><div class="form-error">Required</div></div>
+        <div class="form-group"><label>Category</label><select id="goalCat" required>${opts(GOAL_CATS)}</select></div>
+        <div class="form-group"><label>Target Amount (£)</label><input type="number" id="goalTarget" step="0.01" min="0" required></div>
+        <div class="form-group"><label>Current Saved (£)</label><input type="number" id="goalCurrent" step="0.01" min="0" required></div>
+        <div class="form-group"><label>Deadline</label><input type="date" id="goalDeadline" required></div>
+      </div><div class="form-actions"><button type="submit" class="btn btn-primary">+ Add Goal</button></div></form>
+    </div>
+    <div class="goals-grid" id="goalsGrid"></div>
+  `;
+      const grid = document.getElementById('goalsGrid');
+      DATA.goals.forEach(g => {
+        const pct = g.targetAmount ? Math.min((g.currentAmount / g.targetAmount) * 100, 100) : 0;
+        const remaining = g.targetAmount - g.currentAmount;
+        const now = new Date(), dl = new Date(g.deadline);
+        const monthsLeft = Math.max(1, Math.ceil((dl - now) / (1000 * 60 * 60 * 24 * 30)));
+        const monthlySaving = remaining > 0 ? remaining / monthsLeft : 0;
+        const color = GOAL_COLORS[g.category] || 'blue';
+        grid.innerHTML += `<div class="goal-card">
+      <div class="goal-icon" style="background:${BGCOLORS[g.category] || BGCOLORS.other}">${ICONS[g.category] || '🎯'}</div>
+      <div style="display:flex;justify-content:space-between;align-items:start"><h3>${g.name}</h3><button class="btn btn-sm btn-danger" onclick="deleteGoal(${g.id})">✕</button></div>
+      <div class="goal-amounts"><span>${fmt(g.currentAmount)} saved</span><span>${fmt(g.targetAmount)} target</span></div>
+      <div class="progress-bar" style="height:10px;margin:.5rem 0"><div class="progress-fill ${color}" style="width:${pct}%"></div></div>
+      <div style="display:flex;justify-content:space-between;font-size:.78rem;color:var(--text-muted);margin-top:.3rem"><span>${pct.toFixed(1)}% complete</span><span>Due ${fmtDate(g.deadline)}</span></div>
+      ${remaining > 0 ? `<div style="margin-top:.75rem;padding:.6rem;background:var(--surface-alt);border-radius:var(--radius);font-size:.82rem"><strong>💡 Save ${fmt(monthlySaving)}/month</strong> to reach your goal by the deadline (${monthsLeft} months remaining)</div>` : '<div style="margin-top:.75rem;padding:.6rem;background:var(--success-light);border-radius:var(--radius);font-size:.82rem;color:var(--success)"><strong>🎉 Goal reached!</strong></div>'}
+    </div>`;
+      });
+    }
+    function addGoal(e) {
+      e.preventDefault(); const f = e.target; if (!validate(f)) return;
+      DATA.goals.push({ id: ++nextId, name: f.goalName.value, category: f.goalCat.value, targetAmount: Number(f.goalTarget.value), currentAmount: Number(f.goalCurrent.value), deadline: f.goalDeadline.value });
+      f.reset(); toast('Goal added'); render();
+    }
+    function deleteGoal(id) { DATA.goals = DATA.goals.filter(g => g.id !== id); toast('Goal removed', 'warning'); render() }
+
+    // ═══════════════════════════════════════
+    // REPORTS
+    // ═══════════════════════════════════════
+    function renderReports(c) {
+      const income = calcMonthlyIncome(), expenses = calcMonthlyExpenses(), net = calcNetWorth();
+      const savingsRate = calcSavingsRate();
+      c.innerHTML = `
+    <div class="form-section"><h3>Monthly Financial Summary — ${new Date().toLocaleDateString('en-GB', { month: 'long', year: 'numeric' })}</h3>
+      <div style="overflow-x:auto"><table>
+        <tr><td><strong>Total Income</strong></td><td style="text-align:right">${fmt(income)}</td></tr>
+        <tr><td><strong>Total Expenses</strong></td><td style="text-align:right;color:var(--danger)">${fmt(expenses)}</td></tr>
+        <tr style="border-top:2px solid var(--border)"><td><strong>Net Cash Flow</strong></td><td style="text-align:right;font-weight:700;color:${income - expenses >= 0 ? 'var(--success)' : 'var(--danger)'}">${income - expenses >= 0 ? '+' : '−'}${fmt(income - expenses)}</td></tr>
+        <tr><td><strong>Savings Rate</strong></td><td style="text-align:right">${fmtPct(savingsRate)}</td></tr>
+        <tr><td><strong>Net Worth</strong></td><td style="text-align:right">${fmt(net)}</td></tr>
+        <tr><td><strong>Total Assets</strong></td><td style="text-align:right">${fmt(calcTotalAssets())}</td></tr>
+        <tr><td><strong>Total Liabilities</strong></td><td style="text-align:right;color:var(--danger)">${fmt(calcTotalDebts())}</td></tr>
+        <tr><td><strong>Debt-to-Income</strong></td><td style="text-align:right">${fmtPct(calcDebtToIncome())}</td></tr>
+      </table></div>
+    </div>
+    <div class="form-section"><h3>Spending by Category</h3>
+      <div style="overflow-x:auto"><table><thead><tr><th>Category</th><th>Amount</th><th>% of Total</th><th>Budget</th><th>Status</th></tr></thead><tbody id="reportCatTable"></tbody></table></div>
+    </div>
+    <div class="form-section"><h3>Income Sources</h3>
+      <div style="overflow-x:auto"><table><thead><tr><th>Source</th><th>Monthly Amount</th><th>Annual</th><th>% of Income</th></tr></thead><tbody id="reportIncTable"></tbody></table></div>
+    </div>
+    <div class="form-section"><h3>Annual Projection</h3>
+      <div style="overflow-x:auto"><table>
+        <tr><td><strong>Projected Annual Income</strong></td><td style="text-align:right">${fmt(income * 12)}</td></tr>
+        <tr><td><strong>Projected Annual Expenses</strong></td><td style="text-align:right">${fmt(expenses * 12)}</td></tr>
+        <tr><td><strong>Projected Annual Savings</strong></td><td style="text-align:right;color:var(--success)">${fmt((income - expenses) * 12)}</td></tr>
+      </table></div>
+    </div>
+    <div class="form-actions"><button class="btn btn-primary" onclick="exportCSV()">📥 Export as CSV</button><button class="btn btn-secondary" onclick="window.print()">🖨️ Print Report</button></div>
+  `;
+      // Category table
+      const catTb = document.getElementById('reportCatTable');
+      const expCats = getExpensesByCategory(); const budgetMap = {}; DATA.budgets.forEach(b => { budgetMap[b.category] = b.allocated });
+      expCats.forEach(([cat, amt]) => {
+        const pct = expenses ? (amt / expenses) * 100 : 0;
+        const bud = budgetMap[cat];
+        const status = bud ? (amt > bud ? '<span class="badge badge-danger">Over</span>' : '<span class="badge badge-success">OK</span>') : '<span class="badge badge-warning">No budget</span>';
+        catTb.innerHTML += `<tr><td>${CATS[cat] || cat}</td><td>${fmt(amt)}</td><td>${fmtPct(pct)}</td><td>${bud ? fmt(bud) : '—'}</td><td>${status}</td></tr>`;
+      });
+      // Income table
+      const incTb = document.getElementById('reportIncTable');
+      DATA.incomes.forEach(i => {
+        const m = monthlyAmount(i); const pct = income ? (m / income) * 100 : 0;
+        incTb.innerHTML += `<tr><td>${i.source}</td><td>${fmt(m)}</td><td>${fmt(m * 12)}</td><td>${fmtPct(pct)}</td></tr>`;
+      });
+    }
+    function exportCSV() {
+      let csv = 'Category,Type,Description,Amount,Date\n';
+      DATA.incomes.forEach(i => { csv += `"${INCOME_CATS[i.category] || i.category}","Income","${i.source}",${i.amount},"${i.date}"\n` });
+      DATA.expenses.forEach(e => { csv += `"${CATS[e.category] || e.category}","Expense","${e.description}",${e.amount},"${e.date}"\n` });
+      const blob = new Blob([csv], { type: 'text/csv' }); const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob); a.download = 'finance_report.csv'; a.click();
+      toast('CSV exported');
+    }
+
+    // ═══════════════════════════════════════
+    // INIT
+    // ═══════════════════════════════════════
+    document.getElementById('currentDate').textContent = new Date().toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+    initNav();
+    render();
+
+  </script>
+</body>
+
+</html>
