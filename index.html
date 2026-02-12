@@ -992,6 +992,7 @@
     <div class="modal" onclick="event.stopPropagation()" id="modalContent"></div>
   </div>
 
+  <script src="barclays_data.js"></script>
   <script>
 
     // ═══════════════════════════════════════
@@ -1738,6 +1739,37 @@
     // RECONCILIATION
     // ═══════════════════════════════════════
     let reconData = { transactions: [], parsed: false };
+
+    function loadBarclaysData() {
+      if (typeof BARCLAYS_DATA === 'undefined' || !Array.isArray(BARCLAYS_DATA) || BARCLAYS_DATA.length === 0) return;
+      if (reconData.transactions.length > 0) return; // Already loaded
+      console.log('📊 Auto-loading', BARCLAYS_DATA.length, 'Barclays transactions...');
+      const transactions = BARCLAYS_DATA.map(t => {
+        const desc = t.description || '';
+        const category = categoriseTransaction(desc);
+        const amount = t.amount || 0;
+        const isExpense = amount < 0;
+        const matchedExpense = isExpense ? financialData.expenses.find(e =>
+          e.amount === Math.abs(amount)
+        ) : null;
+        return {
+          date: t.date,
+          description: desc + (t.subcategory ? ` [${t.subcategory}]` : ''),
+          amount,
+          category,
+          subcategory: t.subcategory || '',
+          isExpense,
+          matched: !!matchedExpense,
+          matchedId: matchedExpense ? matchedExpense.id : null,
+          imported: false
+        };
+      });
+      reconData.transactions = transactions;
+      reconData.parsed = true;
+      const debits = transactions.filter(t => t.amount < 0);
+      const credits = transactions.filter(t => t.amount >= 0);
+      console.log(`✓ Barclays data loaded: ${transactions.length} transactions (${debits.length} debits, ${credits.length} credits)`);
+    }
     const RECON_KEYWORDS = {
       housing: ['rent', 'mortgage', 'council tax', 'ground rent', 'service charge', 'estate agent', 'barclays uk mtges', 'viva managemen', 'crm viva'],
       transport: ['uber', 'tfl', 'train', 'bus', 'fuel', 'petrol', 'diesel', 'parking', 'car wash', 'mot', 'insurance car', 'oyster'],
@@ -2197,6 +2229,7 @@
       document.getElementById('currentDate').textContent = new Date().toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
       loadData();
       recomputeNextId();
+      loadBarclaysData();
       initNav();
       render();
       console.log('✓ FinanceFlow initialized — Income:', financialData.income.length, '| Expenses:', financialData.expenses.length, '| Investments:', financialData.investments.length);
