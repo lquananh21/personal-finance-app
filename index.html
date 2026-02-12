@@ -992,10 +992,10 @@
     // ═══════════════════════════════════════
     const DATA = {
       incomes: [
-        { id: 1, source: 'Salary (McK - Trinh)', category: 'salary', amount: 5039, frequency: 'monthly', date: '2024-01-01' },
-        { id: 2, source: 'Salary (KPMG - Quan)', category: 'salary', amount: 4875, frequency: 'monthly', date: '2024-01-01' },
-        { id: 3, source: 'Viva Apartment 92 Rental', category: 'passive', amount: 1080, frequency: 'monthly', date: '2024-01-01' },
-        { id: 4, source: 'Capital Gain', category: 'investments', amount: 3700, frequency: 'one-time', date: '2024-01-15' },
+        { id: 1, source: 'Salary (McK - Trinh)', category: 'salary', amount: 5039, frequency: 'monthly', startDate: '2024-01-01', endDate: '' },
+        { id: 2, source: 'Salary (KPMG - Quan)', category: 'salary', amount: 4875, frequency: 'monthly', startDate: '2024-01-01', endDate: '' },
+        { id: 3, source: 'Viva Apartment 92 Rental', category: 'passive', amount: 1080, frequency: 'monthly', startDate: '2024-01-01', endDate: '' },
+        { id: 4, source: 'Capital Gain', category: 'investments', amount: 3700, frequency: 'one-time', startDate: '2024-01-15', endDate: '2024-01-15' },
       ],
       expenses: [
         // HOME
@@ -1151,7 +1151,16 @@
     // ═══════════════════════════════════════
     // CALCULATIONS
     // ═══════════════════════════════════════
-    function calcMonthlyIncome() { return DATA.incomes.reduce((s, i) => s + monthlyAmount(i), 0) }
+    function calcMonthlyIncome() {
+      const now = new Date();
+      return DATA.incomes.reduce((s, i) => {
+        const start = i.startDate ? new Date(i.startDate) : null;
+        const end = i.endDate ? new Date(i.endDate) : null;
+        if (start && start > now) return s;
+        if (end && end < now) return s;
+        return s + monthlyAmount(i);
+      }, 0);
+    }
     function calcMonthlyExpenses() { return sumBy(DATA.expenses, 'amount') }
     function calcTotalAssets() { return sumBy(DATA.investments, 'currentValue') }
     function calcTotalDebts() { return sumBy(DATA.debts, 'balance') }
@@ -1300,11 +1309,10 @@
     // INCOME
     // ═══════════════════════════════════════
     function renderIncome(c) {
-      const ytd = DATA.incomes.reduce((s, i) => s + monthlyAmount(i), 0) * 1; // current month
       const monthly = calcMonthlyIncome();
       c.innerHTML = `
     <div class="metrics-grid">
-      <div class="metric-card green"><div class="metric-label">Monthly Income</div><div class="metric-value">${fmt(monthly)}</div></div>
+      <div class="metric-card green"><div class="metric-label">Monthly Active Income</div><div class="metric-value">${fmt(monthly)}</div><div class="metric-sub">Based on current active sources</div></div>
       <div class="metric-card blue"><div class="metric-label">Annual Projection</div><div class="metric-value">${fmt(monthly * 12)}</div></div>
       <div class="metric-card purple"><div class="metric-label">Income Sources</div><div class="metric-value">${DATA.incomes.length}</div></div>
     </div>
@@ -1315,28 +1323,32 @@
           <div class="form-group"><label>Category</label><select id="incCategory" required>${opts(INCOME_CATS)}</select></div>
           <div class="form-group"><label>Amount (£)</label><input type="number" id="incAmount" step="0.01" min="0" required><div class="form-error">Enter a positive amount</div></div>
           <div class="form-group"><label>Frequency</label><select id="incFrequency"><option value="monthly">Monthly</option><option value="bi-weekly">Bi-Weekly</option><option value="weekly">Weekly</option><option value="one-time">One-Time</option></select></div>
-          <div class="form-group"><label>Date</label><input type="date" id="incDate" required><div class="form-error">Required</div></div>
+          <div class="form-group"><label>Start Date</label><input type="date" id="incStart" required><div class="form-error">Required</div></div>
+          <div class="form-group"><label>End Date (Optional)</label><input type="date" id="incEnd"></div>
         </div>
         <div class="form-actions"><button type="submit" class="btn btn-primary">+ Add Income</button></div>
       </form>
     </div>
     <div class="form-section"><h3>Income Sources</h3>
-      <div style="overflow-x:auto"><table><thead><tr><th>Source</th><th>Category</th><th>Amount</th><th>Frequency</th><th>Date</th><th>Monthly Eq.</th><th></th></tr></thead><tbody id="incomeTable"></tbody></table></div>
+      <div style="overflow-x:auto"><table><thead><tr><th>Source</th><th>Category</th><th>Amount</th><th>Frequency</th><th>Start</th><th>End</th><th>Monthly Eq.</th><th></th></tr></thead><tbody id="incomeTable"></tbody></table></div>
     </div>
   `;
-      document.getElementById('incDate').value = new Date().toISOString().split('T')[0];
+      document.getElementById('incStart').value = new Date().toISOString().split('T')[0];
       renderIncomeTable();
     }
     function renderIncomeTable() {
       const tb = document.getElementById('incomeTable'); if (!tb) return;
-      tb.innerHTML = DATA.incomes.map(i => `<tr><td>${i.source}</td><td><span class="badge badge-primary">${INCOME_CATS[i.category] || i.category}</span></td><td>${fmt(i.amount)}</td><td style="text-transform:capitalize">${i.frequency.replace('_', ' ')}</td><td>${fmtDate(i.date)}</td><td>${fmt(monthlyAmount(i))}</td><td><button class="btn btn-sm btn-danger" onclick="deleteIncome(${i.id})">✕</button></td></tr>`).join('');
+      tb.innerHTML = DATA.incomes.sort((a, b) => new Date(b.startDate) - new Date(a.startDate)).map(i => {
+        const isActive = (!i.endDate || new Date(i.endDate) >= new Date()) && (!i.startDate || new Date(i.startDate) <= new Date());
+        return `<tr style="${!isActive ? 'opacity:0.6' : ''}"><td>${i.source}${!isActive ? ' <span class="badge badge-warning" style="font-size:0.6rem">Inactive</span>' : ''}</td><td><span class="badge badge-primary">${INCOME_CATS[i.category] || i.category}</span></td><td>${fmt(i.amount)}</td><td style="text-transform:capitalize">${i.frequency.replace('_', ' ')}</td><td>${fmtDate(i.startDate)}</td><td>${i.endDate ? fmtDate(i.endDate) : '—'}</td><td>${fmt(monthlyAmount(i))}</td><td><button class="btn btn-sm btn-danger" onclick="deleteIncome(${i.id})">✕</button></td></tr>`
+      }).join('');
     }
     function addIncome(e) {
       e.preventDefault(); const f = e.target; if (!validate(f)) return;
-      DATA.incomes.push({ id: ++nextId, source: f.incSource.value, category: f.incCategory.value, amount: Number(f.incAmount.value), frequency: f.incFrequency.value, date: f.incDate.value });
-      f.reset(); f.incDate.value = new Date().toISOString().split('T')[0]; toast('Income source added'); renderIncomeTable();
+      DATA.incomes.push({ id: ++nextId, source: f.incSource.value, category: f.incCategory.value, amount: Number(f.incAmount.value), frequency: f.incFrequency.value, startDate: f.incStart.value, endDate: f.incEnd.value });
+      f.reset(); f.incStart.value = new Date().toISOString().split('T')[0]; toast('Income source added'); render();
     }
-    function deleteIncome(id) { DATA.incomes = DATA.incomes.filter(i => i.id !== id); toast('Income removed', 'warning'); renderIncomeTable() }
+    function deleteIncome(id) { DATA.incomes = DATA.incomes.filter(i => i.id !== id); toast('Income removed', 'warning'); render() }
 
     // ═══════════════════════════════════════
     // EXPENSES
